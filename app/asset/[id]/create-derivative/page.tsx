@@ -170,7 +170,7 @@ export default function CreateDerivativePage({ params }: PageProps) {
         derivativeType: derivativeType,
         proposedTerms: proposedTerms,
         //originalAsset: doc(db, 'IPA', id),
-        originalAssetId: id,
+        parent: id,
         creator_address: wallet.account.address,
         status: 'pending', // Status can be: pending, approved, rejected
         remix: 0,
@@ -179,6 +179,12 @@ export default function CreateDerivativePage({ params }: PageProps) {
 
       const derivativeRef = await addDoc(collection(db, 'Derivatives'), derivativeData);
       console.log("New derivative created with ID:", derivativeRef.id);
+
+      // Update the original asset's derivatives array
+      const originalAssetRef = doc(db, 'IPA', id);
+      await updateDoc(originalAssetRef, {
+        derivatives: arrayUnion(doc(db, 'Derivatives', derivativeRef.id))
+      });
 
       // Update user's derivatives array - find user by wallet address
       const usersSnapshot = await getDocs(query(
@@ -385,7 +391,7 @@ export default function CreateDerivativePage({ params }: PageProps) {
           </div>
 
           <div className="flex gap-2">
-            <Button type="submit">Submit for Approval</Button>
+            <Button type="submit">Submit</Button>
             <Button type="button" variant="outline" onClick={clearForm}>
               Clear
             </Button>
