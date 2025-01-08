@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { db } from '@/lib/firebase'
 import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firestore'
-import { EditProfileDialog } from '@/components/edit-profile-dialog'
+import { EditProfileDialog } from '@/components/ui/edit-profile-dialog'
+import { useRouter } from 'next/navigation'
 
 interface UserProfile {
   user_name: string
@@ -30,6 +31,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const { data: wallet } = useWalletClient();
+  const router = useRouter()
 
   const fetchUserProfile = async () => {
     if (!wallet?.account?.address) {
@@ -99,6 +101,10 @@ export default function ProfilePage() {
     setIsEditDialogOpen(true)
   }
 
+  const handleAssetClick = (assetId: string) => {
+    router.push(`/asset/${assetId}`)
+  }
+
   if (!wallet?.account?.address) {
     return (
       <div className="container mx-auto px-4 py-8">
@@ -148,23 +154,28 @@ export default function ProfilePage() {
                     <p className="text-lg font-semibold">
                       ${user?.total_earnings?.toLocaleString() || '0'}
                     </p>
-                    <p className="text-sm text-gray-600">Total Earnings</p>
+                    <p className="text-sm text-gray-600">Total Royalties</p>
                   </div>
                 </div>
               </div>
-              <Button onClick={handleEditProfile}>
-                Edit Profile
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => router.push('/collaboration-hub')}>
+                  Collaboration Hub
+                </Button>
+                <Button onClick={handleEditProfile}>
+                  Edit Profile
+                </Button>
+              </div>
             </div>
           </div>
         </div>
       </Card>
 
       {/* Tabs Section */}
-      <Tabs defaultValue="assets" className="w-full">
+      <Tabs defaultValue="store" className="w-full">
         <TabsList className="mb-8">
-          <TabsTrigger value="assets">Assets</TabsTrigger>
           <TabsTrigger value="store">Store</TabsTrigger>
+          <TabsTrigger value="assets">Assets</TabsTrigger>
         </TabsList>
         
         <TabsContent value="assets">
@@ -173,7 +184,11 @@ export default function ProfilePage() {
               <p>Loading assets...</p>
             ) : assets.length > 0 ? (
               assets.map((asset) => (
-                <Card key={asset.id} className="p-4">
+                <Card 
+                  key={asset.id} 
+                  className="p-4 cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => handleAssetClick(asset.id)}
+                >
                   <div className="relative w-full aspect-[3/4]">
                     {asset.imageURL && asset.imageURL.length > 0 ? (
                       <Image 
@@ -188,7 +203,9 @@ export default function ProfilePage() {
                       </div>
                     )}
                   </div>
-                  {/* Add more asset details as needed */}
+                  <div className="mt-4">
+                    <h3 className="font-semibold">{asset.title}</h3>
+                  </div>
                 </Card>
               ))
             ) : (
