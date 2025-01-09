@@ -207,10 +207,9 @@ export default async function AssetPage(props: PageProps) {
               </div>
 
               {/* Derivative Works Section */}
-              <div>
+              {/* <div>
                 <h2 className="text-xl font-semibold mb-4">Highlighted Derivative Works</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Example derivative works - replace with actual data */}
                   <div className="bg-gray-50 rounded-lg overflow-hidden">
                     <div className="relative aspect-video w-full">
                       <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
@@ -226,14 +225,8 @@ export default async function AssetPage(props: PageProps) {
                       </div>
                     </div>
                   </div>
-
-                  {/* Add more derivative work cards as needed */}
                 </div>
-                
-                {/* <div className="text-center py-8 bg-gray-50 rounded-lg mt-4">
-                  <p className="text-gray-600">No derivative works have been created yet</p>
-                </div> */}
-              </div>
+              </div> */}
 
               {/* Add more asset details as needed */}
             </div>

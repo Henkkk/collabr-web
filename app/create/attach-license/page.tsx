@@ -8,11 +8,10 @@ import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, query, where }
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { licenseTemplates } from '@/lib/constants/licenseTemplates';
 import { v4 as uuidv4 } from 'uuid';
-
+import { Notification } from '@/components/ui/notification';
 const convertDateToTimestamp = (dateString: string) => {
     return dateString ? new Date(dateString).getTime() : 0;
 };
-
 const SUPPORTED_CURRENCIES = [
   'BTC',
   'ETH',
@@ -25,42 +24,65 @@ const SUPPORTED_CURRENCIES = [
   'DOGE',
   'MATIC'
 ] as const;
-
 export type SupportedCurrency = typeof SUPPORTED_CURRENCIES[number];
-
+const initDB = async () => {
+  return new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open('assetStore', 1);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains('assets')) {
+        db.createObjectStore('assets');
+      }
+    };
+  });
+};
 export default function AttachLicensePage() {
     const router = useRouter();
     const { data: wallet } = useWalletClient();
     const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
     const [formData, setFormData] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-
+    const [showNotification, setShowNotification] = useState(false);
     const handleSubmit = async (e: React.FormEvent, pilTerms: any) => {
         e.preventDefault();
         if (!wallet?.account?.address) {
             alert('Failed to create asset, because there is no wallet connected');
             return;
         }
-
         setIsSubmitting(true);
-
         try {
-            // Get asset data from localStorage
+            // Get asset data from localStorage and IndexedDB
             const assetName = localStorage.getItem('assetName');
             const assetDescription = localStorage.getItem('assetDescription');
-            const assetImage = localStorage.getItem('assetImage');
             const assetAttributes = JSON.parse(localStorage.getItem('assetAttributes') || '[]');
             const assetTags = JSON.parse(localStorage.getItem('assetTags') || '[]');
+
+            // Get image from IndexedDB
+            const IndexedDB = await initDB();
+            const transaction = IndexedDB.transaction('assets', 'readonly');
+            const store = transaction.objectStore('assets');
+            const imageRequest = store.get('assetImage');
+            
+            const assetImage = await new Promise<string>((resolve, reject) => {
+                imageRequest.onsuccess = () => resolve(imageRequest.result);
+                imageRequest.onerror = () => reject(imageRequest.error);
+            });
 
             if (!assetName || !assetImage) {
                 throw new Error('Missing required asset data');
             }
 
-            // Upload image to Firebase Storage
+            //console.log("this is the assetImage", assetImage);
+
+            // Upload image to Firebase Storage first
             const imageId = uuidv4();
-            const imageRef = ref(storage, `ip_assets/${imageId}/${Date.now()}`);
+            const imageRef = ref(storage, `ip_assets/${imageId}`);
             await uploadString(imageRef, assetImage, 'data_url');
-            const imageUrl = await getDownloadURL(imageRef);
+            const imageURL = await getDownloadURL(imageRef);
 
             // Convert BigInt values to strings and ensure proper data types
             const sanitizedPilTerms = {
@@ -70,12 +92,11 @@ export default function AttachLicensePage() {
                 commercialRevShare: Number(pilTerms.commercialRevShare),
                 defaultMintingFee: Number(pilTerms.defaultMintingFee),
             };
-
-            // Create new IPA document with sanitized data
+            // Create new IPA document with sanitized data and image URL
             const ipaData = {
                 title: assetName,
                 description: assetDescription,
-                imageURL: imageUrl,
+                imageURL: imageURL,
                 attributes: assetAttributes,
                 tags: assetTags,
                 createdAt: new Date().toISOString(),
@@ -86,16 +107,14 @@ export default function AttachLicensePage() {
                 royalty: 0,
                 expiration: convertDateToTimestamp(formData.expiration),
             };
-
             const ipaRef = await addDoc(collection(db, 'IPA'), ipaData);
-            console.log("New IPA created with ID:", ipaRef.id);
-
+            //console.log("New IPA created with ID:", ipaRef.id);
+            
             // Update user's IP array - find user by wallet address
             const usersSnapshot = await getDocs(query(
                 collection(db, 'Users'),
                 where('wallet_address', '==', wallet.account.address)
             ));
-
             if (!usersSnapshot.empty) {
                 const userDoc = usersSnapshot.docs[0];
                 await updateDoc(userDoc.ref, {
@@ -104,16 +123,19 @@ export default function AttachLicensePage() {
             } else {
                 console.error('User document not found for wallet address:', wallet.account.address);
             }
+            // Clear IndexedDB after successful submission
+            const clearTransaction = IndexedDB.transaction('assets', 'readwrite');
+            const clearStore = clearTransaction.objectStore('assets');
+            clearStore.delete('assetImage');
 
             // Clear localStorage
             localStorage.removeItem('assetName');
             localStorage.removeItem('assetDescription');
-            localStorage.removeItem('assetImage');
             localStorage.removeItem('assetAttributes');
             localStorage.removeItem('assetTags');
-
-            router.push('/profile');
-
+            
+            // Show notification instead of redirecting immediately
+            setShowNotification(true);
         } catch (error) {
             console.error('Error creating asset:', error);
             alert('Failed to create asset. Please try again.');
@@ -121,7 +143,6 @@ export default function AttachLicensePage() {
             setIsSubmitting(false);
         }
     };
-
     const LicenseConfiguration = ({ template, onBack }: { 
         template: typeof licenseTemplates[0], 
         onBack: () => void 
@@ -145,14 +166,12 @@ export default function AttachLicensePage() {
                             commercialUse: true,
                             commercialAttribution: true,
                         } : {}),
-
                         ...((template.id === '3') ? {
                             derivativesAllowed: true,
                             derivativesAttribution: true,
                             commercialUse: true,
                             commercialAttribution: true,
                         } : {}),
-
                         transferable: formData.transferable === 'true',
                         royaltyPolicy: formData.royaltyPolicy || "",
                         defaultMintingFee: parseFloat(formData.defaultMintingFee || '0'),
@@ -185,7 +204,6 @@ export default function AttachLicensePage() {
                                     <option value="false">No</option>
                                 </select>
                             </div>
-
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-gray-700">
                                     Derivatives Attribution
@@ -200,7 +218,6 @@ export default function AttachLicensePage() {
                                     <option value="false">No</option>
                                 </select>
                             </div>
-
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-gray-700">
                                     Commercial Use
@@ -215,7 +232,6 @@ export default function AttachLicensePage() {
                                     <option value="false">No</option>
                                 </select>
                             </div>
-
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-gray-700">
                                     Commercial Attribution
@@ -232,7 +248,6 @@ export default function AttachLicensePage() {
                             </div>
                         </>
                     )}
-
                     {template.id === '2' && (
                         <>
                             <div className="space-y-2">
@@ -249,7 +264,6 @@ export default function AttachLicensePage() {
                                     <option value="false">No</option>
                                 </select>
                             </div>
-
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-gray-700">
                                     Commercial Attribution
@@ -266,7 +280,6 @@ export default function AttachLicensePage() {
                             </div>
                         </>
                     )}
-
                     {template.id === '3' && (
                         <>
                             <div className="space-y-2">
@@ -283,7 +296,6 @@ export default function AttachLicensePage() {
                                     <option value="false">No</option>
                                 </select>
                             </div>
-
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-gray-700">
                                     Derivatives Attribution
@@ -298,7 +310,6 @@ export default function AttachLicensePage() {
                                     <option value="false">No</option>
                                 </select>
                             </div>
-
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-gray-700">
                                     Commercial Use
@@ -313,7 +324,6 @@ export default function AttachLicensePage() {
                                     <option value="false">No</option>
                                 </select>
                             </div>
-
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium text-gray-700">
                                     Commercial Attribution
@@ -330,9 +340,96 @@ export default function AttachLicensePage() {
                             </div>
                         </>
                     )}
-
-                    {template.parameters.map((param, index) => (
-                        <div key={index}>{param}</div>
+                    {template.parameters.map((param) => (
+                        <div key={param}>
+                            <label className="block text-sm font-medium mb-1">
+                                {param.split(/(?=[A-Z])/).join(' ')}
+                            </label>
+                            {param === 'defaultMintingFee' || param === 'commercialRevCeiling' ? (
+                                <input
+                                    type="number"
+                                    min="0"
+                                    className="w-full p-2 border rounded"
+                                    value={formData[param] || ''}
+                                    onChange={(e) => setFormData({
+                                        ...formData,
+                                        [param]: e.target.value
+                                    })}
+                                />
+                            ) : ['royaltyPolicy', 'commercializerChecker', 'commercializerCheckerData'].includes(param) ? (
+                                <input
+                                    type="text"
+                                    placeholder=""
+                                    className="w-full p-2 border rounded"
+                                    value={formData[param] || ''}
+                                    onChange={(e) => setFormData({
+                                        ...formData,
+                                        [param]: e.target.value
+                                    })}
+                                />
+                            ) : param === 'currency' ? (
+                                <select
+                                    className="w-full p-2 border rounded"
+                                    value={formData[param] || ''}
+                                    onChange={(e) => setFormData({
+                                        ...formData,
+                                        [param]: e.target.value
+                                    })}
+                                >
+                                    <option value="">Select currency...</option>
+                                    {SUPPORTED_CURRENCIES.map((currency) => (
+                                        <option key={currency} value={currency}>
+                                            {currency}
+                                        </option>
+                                    ))}
+                                </select>
+                            ) : param === 'commercialRevShare' ? (
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    className="w-full p-2 border rounded"
+                                    value={formData[param] || '0'}
+                                    onChange={(e) => setFormData({
+                                        ...formData,
+                                        [param]: e.target.value
+                                    })}
+                                />
+                            ) : param === 'uri' ? (
+                                <input
+                                    type="text"
+                                    className="w-full p-2 border rounded"
+                                    value={formData[param] || ''}
+                                    onChange={(e) => setFormData({
+                                        ...formData,
+                                        [param]: e.target.value
+                                    })}
+                                />
+                            ) : param === 'expiration' ? (
+                                <input
+                                    type="date"
+                                    className="w-full p-2 border rounded"
+                                    value={formData[param] || ''}
+                                    onChange={(e) => setFormData({
+                                        ...formData,
+                                        [param]: e.target.value
+                                    })}
+                                />
+                            ) : (
+                                <select
+                                    className="w-full p-2 border rounded"
+                                    value={formData[param] || ''}
+                                    onChange={(e) => setFormData({
+                                        ...formData,
+                                        [param]: e.target.value
+                                    })}
+                                >
+                                    <option value="">Select...</option>
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                                </select>
+                            )}
+                        </div>
                     ))}
                     
                     <div className="flex justify-between gap-4">
@@ -356,13 +453,23 @@ export default function AttachLicensePage() {
             </div>
         );
     };
-
     return (
         <div className="p-6 max-w-4xl mx-auto">
+            <Notification
+                message="Asset created successfully!"
+                isOpen={showNotification}
+                onClose={() => setShowNotification(false)}
+                onConfirm={() => router.push('/profile')}
+                type="success"
+                showConfirm={true}
+            />
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">Attach License</h1>
                 <button
-                    onClick={() => router.push('/create/create-asset')}
+                    onClick={() => {
+                        // Don't clear any data when going back to create-asset
+                        router.push('/create/create-asset');
+                    }}
                     className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
                 >
                     Back
@@ -394,7 +501,6 @@ export default function AttachLicensePage() {
                             </div>
                         ))}
                     </div>
-
                     <button
                         onClick={() => router.push('/create/custom-license')}
                         className="w-full mt-6 p-4 border-2 border-dashed border-blue-500 rounded-lg text-blue-500 hover:bg-blue-50 flex items-center justify-center"

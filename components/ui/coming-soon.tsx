@@ -15,7 +15,7 @@ export function ComingSoon() {
   return (
     <div className="min-h-[80vh] w-full flex flex-col items-center justify-center px-4">
       <div className="max-w-2xl mx-auto text-center space-y-8">
-        <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent pb-[0.1em]">
+        <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent pb-[0.1em]">
           Coming Soon
         </h1>
         

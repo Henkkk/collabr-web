@@ -8,13 +8,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PlusCircle, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-export default function CreateAssetPage() {
-  const [image, setImage] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('assetImage') || null;
-    }
-    return null;
+const initDB = async () => {
+  return new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open('assetStore', 1);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains('assets')) {
+        db.createObjectStore('assets');
+      }
+    };
   });
+};
+
+export default function CreateAssetPage() {
+  const [image, setImage] = useState<string | null>(null);
   const [description, setDescription] = useState(() => localStorage.getItem('assetDescription') || '');
   const [attributes, setAttributes] = useState<{ key: string; value: string }[]>(() => {
     if (typeof window !== 'undefined') {
@@ -34,7 +45,46 @@ export default function CreateAssetPage() {
   const router = useRouter()
 
   useEffect(() => {
-    localStorage.setItem('assetImage', image || '');
+    const loadData = async () => {
+      try {
+        const db = await initDB();
+        const transaction = db.transaction('assets', 'readonly');
+        const store = transaction.objectStore('assets');
+        const imageRequest = store.get('assetImage');
+        
+        imageRequest.onsuccess = () => {
+          if (imageRequest.result) {
+            setImage(imageRequest.result);
+          }
+        };
+      } catch (error) {
+        console.error('Error loading image from IndexedDB:', error);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    const saveData = async () => {
+      try {
+        const db = await initDB();
+        const transaction = db.transaction('assets', 'readwrite');
+        const store = transaction.objectStore('assets');
+        
+        if (image) {
+          store.put(image, 'assetImage');
+        } else {
+          store.delete('assetImage');
+        }
+      } catch (error) {
+        console.error('Error saving image to IndexedDB:', error);
+      }
+    };
+
+    saveData();
+    
+    // Still save other data to localStorage as before
     localStorage.setItem('assetName', name);
     localStorage.setItem('assetDescription', description);
     localStorage.setItem('assetAttributes', JSON.stringify(attributes));
@@ -89,7 +139,7 @@ export default function CreateAssetPage() {
     router.push('/create/attach-license')
   }
 
-  const clearForm = () => {
+  const clearForm = async () => {
     setImage(null);
     setName('');
     setDescription('');
@@ -98,11 +148,20 @@ export default function CreateAssetPage() {
     setCurrentTag('');
     
     // Clear localStorage
-    localStorage.removeItem('assetImage');
     localStorage.removeItem('assetName');
     localStorage.removeItem('assetDescription');
     localStorage.removeItem('assetAttributes');
     localStorage.removeItem('assetTags');
+    
+    // Clear IndexedDB
+    try {
+      const db = await initDB();
+      const transaction = db.transaction('assets', 'readwrite');
+      const store = transaction.objectStore('assets');
+      store.delete('assetImage');
+    } catch (error) {
+      console.error('Error clearing image from IndexedDB:', error);
+    }
   };
 
   return (

@@ -15,6 +15,23 @@ import { ref, uploadString, getDownloadURL } from 'firebase/storage'
 import { collection, addDoc, updateDoc, getDocs, query, where, arrayUnion } from 'firebase/firestore'
 import { storage } from '@/lib/firebase'
 import { v4 as uuidv4 } from 'uuid'
+import { Notification } from '@/components/ui/notification'
+
+const initDB = async () => {
+  return new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open('derivativeStore', 1);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains('derivatives')) {
+        db.createObjectStore('derivatives');
+      }
+    };
+  });
+};
 
 interface Asset {
   id: string;
@@ -44,12 +61,7 @@ export default function CreateDerivativePage({ params }: PageProps) {
   const { id } = use(params);
   const { data: wallet } = useWalletClient();
   const [originalAsset, setOriginalAsset] = useState<Asset | null>(null);
-  const [image, setImage] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('derivativeImage') || null;
-    }
-    return null;
-  });
+  const [image, setImage] = useState<string | null>(null);
   const [description, setDescription] = useState(() => localStorage.getItem('derivativeDescription') || '');
   const [attributes, setAttributes] = useState<{ key: string; value: string }[]>(() => {
     if (typeof window !== 'undefined') {
@@ -67,7 +79,7 @@ export default function CreateDerivativePage({ params }: PageProps) {
   const [name, setName] = useState(() => localStorage.getItem('derivativeName') || '');
   const [derivativeType, setDerivativeType] = useState(() => localStorage.getItem('derivativeType') || '');
   const [proposedTerms, setProposedTerms] = useState(() => localStorage.getItem('proposedTerms') || '');
-
+  const [showNotification, setShowNotification] = useState(false);
   const router = useRouter()
 
   useEffect(() => {
@@ -90,12 +102,50 @@ export default function CreateDerivativePage({ params }: PageProps) {
         console.error('Error fetching original asset:', error);
       }
     };
-
     fetchOriginalAsset();
   }, [id]);
 
   useEffect(() => {
-    localStorage.setItem('derivativeImage', image || '');
+    const loadData = async () => {
+      try {
+        const db = await initDB();
+        const transaction = db.transaction('derivatives', 'readonly');
+        const store = transaction.objectStore('derivatives');
+        const imageRequest = store.get('derivativeImage');
+        
+        imageRequest.onsuccess = () => {
+          if (imageRequest.result) {
+            setImage(imageRequest.result);
+          }
+        };
+      } catch (error) {
+        console.error('Error loading image from IndexedDB:', error);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    const saveData = async () => {
+      try {
+        const db = await initDB();
+        const transaction = db.transaction('derivatives', 'readwrite');
+        const store = transaction.objectStore('derivatives');
+        
+        if (image) {
+          store.put(image, 'derivativeImage');
+        } else {
+          store.delete('derivativeImage');
+        }
+      } catch (error) {
+        console.error('Error saving image to IndexedDB:', error);
+      }
+    };
+
+    saveData();
+    
+    // Still save other data to localStorage as before
     localStorage.setItem('derivativeName', name);
     localStorage.setItem('derivativeDescription', description);
     localStorage.setItem('derivativeAttributes', JSON.stringify(attributes));
@@ -113,112 +163,74 @@ export default function CreateDerivativePage({ params }: PageProps) {
       reader.readAsDataURL(e.target.files[0])
     }
   }
-
   const handleAttributeChange = (index: number, field: 'key' | 'value', value: string) => {
     const newAttributes = [...attributes]
     newAttributes[index][field] = value
     setAttributes(newAttributes)
   }
-
   const addAttribute = () => {
     setAttributes([...attributes, { key: '', value: '' }])
   }
-
   const removeAttribute = (index: number) => {
     const newAttributes = attributes.filter((_, i) => i !== index)
     setAttributes(newAttributes)
   }
-
   const addTag = () => {
     if (currentTag && !tags.includes(currentTag)) {
       setTags([...tags, currentTag])
       setCurrentTag('')
     }
   }
-
   const removeTag = (tag: string) => {
     setTags(tags.filter(t => t !== tag))
   }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name || !image || !derivativeType) {
+    if (!name || !image) {
       alert('Please fill in all required fields')
       return
     }
-
     if (!wallet?.account?.address) {
       alert('Failed to create derivative, because there is no wallet connected');
       return;
     }
-
     try {
       // Upload image to Firebase Storage
       const imageId = uuidv4();
-      const imageRef = ref(storage, `derivative_assets/${imageId}/${Date.now()}`);
+      const imageRef = ref(storage, `ip_assets/${imageId}`);
       await uploadString(imageRef, image, 'data_url');
       const imageUrl = await getDownloadURL(imageRef);
 
-      // Create new derivative document
-      const derivativeData = {
+      // Create request data
+      const requestData = {
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        parent: id,
+        creator: wallet.account.address,
         title: name,
         description: description,
         imageURL: imageUrl,
         attributes: attributes.filter(attr => attr.key && attr.value),
         tags: tags,
-        createdAt: new Date().toISOString(),
-        derivativeType: derivativeType,
-        proposedTerms: proposedTerms,
-        //originalAsset: doc(db, 'IPA', id),
-        parent: id,
-        creator_address: wallet.account.address,
-        status: 'pending', // Status can be: pending, approved, rejected
         remix: 0,
         royalty: 0,
       };
 
-      const derivativeRef = await addDoc(collection(db, 'Derivatives'), derivativeData);
-      console.log("New derivative created with ID:", derivativeRef.id);
+      // Create request document in Requests collection
+      const requestRef = await addDoc(collection(db, 'Requests'), requestData);
+      console.log("Derivative request created with ID:", requestRef.id);
 
-      // Update the original asset's derivatives array
-      const originalAssetRef = doc(db, 'IPA', id);
-      await updateDoc(originalAssetRef, {
-        derivatives: arrayUnion(doc(db, 'Derivatives', derivativeRef.id))
-      });
-
-      // Update user's derivatives array - find user by wallet address
-      const usersSnapshot = await getDocs(query(
-        collection(db, 'Users'),
-        where('wallet_address', '==', wallet.account.address)
-      ));
-
-      if (!usersSnapshot.empty) {
-        const userDoc = usersSnapshot.docs[0];
-        await updateDoc(userDoc.ref, {
-          derivatives: arrayUnion(doc(db, 'Derivatives', derivativeRef.id))
-        });
-      } else {
-        console.error('User document not found for wallet address:', wallet.account.address);
-      }
-
-      // Clear localStorage
-      localStorage.removeItem('derivativeImage');
-      localStorage.removeItem('derivativeName');
-      localStorage.removeItem('derivativeDescription');
-      localStorage.removeItem('derivativeAttributes');
-      localStorage.removeItem('derivativeTags');
-      localStorage.removeItem('derivativeType');
-      localStorage.removeItem('proposedTerms');
-
-      router.push('/collaboration-hub');
-
+      // Clear form data
+      await clearForm();
+      
+      // Show notification instead of redirecting immediately
+      setShowNotification(true);
     } catch (error) {
       console.error('Error creating derivative:', error);
       alert('Failed to create derivative. Please try again.');
     }
   }
-
-  const clearForm = () => {
+  const clearForm = async () => {
     setImage(null);
     setName('');
     setDescription('');
@@ -229,15 +241,23 @@ export default function CreateDerivativePage({ params }: PageProps) {
     setProposedTerms('');
     
     // Clear localStorage
-    localStorage.removeItem('derivativeImage');
     localStorage.removeItem('derivativeName');
     localStorage.removeItem('derivativeDescription');
     localStorage.removeItem('derivativeAttributes');
     localStorage.removeItem('derivativeTags');
     localStorage.removeItem('derivativeType');
     localStorage.removeItem('proposedTerms');
+    
+    // Clear IndexedDB
+    try {
+      const db = await initDB();
+      const transaction = db.transaction('derivatives', 'readwrite');
+      const store = transaction.objectStore('derivatives');
+      store.delete('derivativeImage');
+    } catch (error) {
+      console.error('Error clearing image from IndexedDB:', error);
+    }
   };
-
   if (!originalAsset) {
     return (
       <div className="container mx-auto p-4">
@@ -245,9 +265,16 @@ export default function CreateDerivativePage({ params }: PageProps) {
       </div>
     );
   }
-
   return (
     <div className="container mx-auto p-4">
+      <Notification
+        message="The derivative is submitted for user to approve"
+        isOpen={showNotification}
+        onClose={() => setShowNotification(false)}
+        onConfirm={() => router.push('/')}
+        type="success"
+        showConfirm={true}
+      />
       <div className="mb-8">
         <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-lg w-full">
           <div className="relative h-24 w-24 flex-shrink-0">
@@ -265,7 +292,6 @@ export default function CreateDerivativePage({ params }: PageProps) {
           </div>
         </div>
       </div>
-
       <div className="grid md:grid-cols-2 gap-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -278,7 +304,6 @@ export default function CreateDerivativePage({ params }: PageProps) {
               required
             />
           </div>
-
           <div>
             <Label htmlFor="image">Upload Derivative Work *</Label>
             <div className="space-y-2">
@@ -310,7 +335,6 @@ export default function CreateDerivativePage({ params }: PageProps) {
               )}
             </div>
           </div>
-
           <div>
             <Label htmlFor="derivativeType">Type of Derivative Work (Optional)</Label>
             <Input
@@ -318,10 +342,8 @@ export default function CreateDerivativePage({ params }: PageProps) {
               value={derivativeType}
               onChange={(e) => setDerivativeType(e.target.value)}
               placeholder="e.g., Manga Adaptation, Musical Remix, etc."
-              required
             />
           </div>
-
           <div>
             <Label htmlFor="description">Description (Optional)</Label>
             <Textarea
@@ -331,7 +353,6 @@ export default function CreateDerivativePage({ params }: PageProps) {
               placeholder="Describe your derivative work..."
             />
           </div>
-
           {/* <div>
             <Label htmlFor="proposedTerms">Proposed Terms *</Label>
             <Textarea
@@ -342,7 +363,6 @@ export default function CreateDerivativePage({ params }: PageProps) {
               required
             />
           </div> */}
-
           <div>
             <Label>Attributes (Optional)</Label>
             {attributes.map((attr, index) => (
@@ -366,7 +386,6 @@ export default function CreateDerivativePage({ params }: PageProps) {
               <PlusCircle className="h-4 w-4 mr-2" /> Add Attribute
             </Button>
           </div>
-
           <div>
             <Label htmlFor="tags">Tags (Optional)</Label>
             <div className="flex gap-2">
@@ -389,7 +408,6 @@ export default function CreateDerivativePage({ params }: PageProps) {
               ))}
             </div>
           </div>
-
           <div className="flex gap-2">
             <Button type="submit">Submit</Button>
             <Button type="button" variant="outline" onClick={clearForm}>
@@ -397,7 +415,6 @@ export default function CreateDerivativePage({ params }: PageProps) {
             </Button>
           </div>
         </form>
-
         <div className="space-y-4">
           <Card>
             <CardHeader>
@@ -419,7 +436,6 @@ export default function CreateDerivativePage({ params }: PageProps) {
                   <p className="text-sm text-gray-700">{proposedTerms}</p>
                 </div>
               )}
-
               {attributes.length > 0 && attributes[0].key && (
                 <div className="mb-4">
                   <h3 className="text-lg font-semibold mb-2">Attributes</h3>
