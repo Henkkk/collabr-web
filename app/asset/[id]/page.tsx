@@ -52,7 +52,17 @@ export default async function AssetPage(props: PageProps) {
         imageURL: String(data.imageURL || ''),
         creator: String(data.creator_name || ''),
         price: Number(data.price || 0),
-        license: data.license
+        license: {
+          terms: {
+            commercialUse: data.license?.terms?.commercialUse || false,
+            commercialAttribution: data.license?.terms?.commercialAttribution || false,
+            commercialRevShare: data.license?.terms?.commercialRevShare || 0,
+            derivativesAllowed: data.license?.terms?.derivativesAllowed || false,
+            derivativesAttribution: data.license?.terms?.derivativesAttribution || false,
+            derivativesReciprocal: data.license?.terms?.derivativesReciprocal || false,
+            transferable: data.license?.terms?.transferable || false,
+          }
+        }
       }
     }
   } catch (error) {

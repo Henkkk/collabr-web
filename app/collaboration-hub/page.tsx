@@ -94,18 +94,33 @@ export default function CollaborationHub() {
 
       const requestData = requestDoc.data();
 
-      // Create new IPA document from the request data
+      // Create new IPA document
       const derivativeRef = await addDoc(collection(db, 'IPA'), {
         ...requestData,
         status: 'approved',
         createdAt: new Date().toISOString(),
       });
 
-      // Update the original asset's derivatives array with the string ID instead of the reference
+      // Update original asset's derivatives array
       const originalAssetRef = doc(db, 'IPA', requestData.parent);
       await updateDoc(originalAssetRef, {
         derivatives: arrayUnion(derivativeRef.id)
       });
+
+      // Get the creator's user document
+      const usersQuery = query(
+        collection(db, 'Users'),
+        where('wallet_address', '==', requestData.creator)
+      );
+      const userSnapshot = await getDocs(usersQuery);
+      
+      if (!userSnapshot.empty) {
+        const userDoc = userSnapshot.docs[0];
+        // Update the user's document with the new IPA reference in the 'item' field
+        await updateDoc(doc(db, 'Users', userDoc.id), {
+          item: arrayUnion(doc(db, 'IPA', derivativeRef.id))
+        });
+      }
 
       // Update request status and add the derivative ID
       await updateDoc(requestRef, {

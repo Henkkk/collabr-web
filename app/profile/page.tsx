@@ -25,6 +25,14 @@ interface Asset {
   // Add other asset properties as needed
 }
 
+interface StoreItem {
+  id: string;
+  title: string;
+  description: string;
+  imageURL: string;
+  // Add other store item properties as needed
+}
+
 export default function ProfilePage() {
   const [user, setUser] = useState<UserProfile>()
   const [assets, setAssets] = useState<Asset[]>([])
@@ -32,6 +40,7 @@ export default function ProfilePage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const { data: wallet } = useWalletClient();
   const router = useRouter()
+  const [storeItems, setStoreItems] = useState<StoreItem[]>([])
 
   const fetchUserProfile = async () => {
     if (!wallet?.account?.address) {
@@ -72,6 +81,24 @@ export default function ProfilePage() {
         } catch (assetError) {
           console.error("Error fetching assets:", assetError);
           setAssets([]);
+        }
+        
+        try {
+          if (userData.item && Array.isArray(userData.item)) {
+            const itemPromises = userData.item.map((itemRef: any) => getDoc(itemRef));
+            const itemDocs = await Promise.all(itemPromises);                        
+            const itemData = itemDocs.map(doc => ({
+              id: doc.id,
+              ...(doc.data() as { [key: string]: any })
+            })) as StoreItem[];
+            
+            setStoreItems(itemData);
+          } else {
+            setStoreItems([]);
+          }
+        } catch (itemError) {
+          console.error("Error fetching store items:", itemError);
+          setStoreItems([]);
         }
         
       } else {
@@ -216,11 +243,37 @@ export default function ProfilePage() {
         
         <TabsContent value="store">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Add your store items cards here */}
-            <Card className="p-4">
-              <h3>Store Item Example</h3>
-              {/* Add store item content */}
-            </Card>
+            {loading ? (
+              <p>Loading store items...</p>
+            ) : storeItems.length > 0 ? (
+              storeItems.map((item) => (
+                <Card 
+                  key={item.id} 
+                  className="p-4 cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => handleAssetClick(item.id)}
+                >
+                  <div className="relative w-full aspect-[3/4]">
+                    {item.imageURL && item.imageURL.length > 0 ? (
+                      <Image 
+                        src={item.imageURL}
+                        alt="Store item image"
+                        fill
+                        className="rounded-lg object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+                        <p>No image available</p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-4">
+                    <h3 className="font-semibold">{item.title}</h3>
+                  </div>
+                </Card>
+              ))
+            ) : (
+              <p>No store items found</p>
+            )}
           </div>
         </TabsContent>
       </Tabs>
