@@ -23,20 +23,22 @@ interface Asset {
   };
 }
 
-interface PageProps {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+type Props = {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata(props: Props) {
+  const params = await props.params
   const { id } = params
   return {
     title: `Asset ${id}`,
   }
 }
 
-export default async function AssetPage(props: PageProps) {
-  const { id } = props.params
+export default async function AssetPage(props: Props) {
+  const params = await props.params
+  const { id } = params
   let asset: Asset | null = null
 
   try {
