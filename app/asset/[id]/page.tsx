@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { db } from '@/lib/firebase'
 import { doc, getDoc } from 'firebase/firestore'
+import WaitlistButton from '@/components/ui/waitlistButton'
 
 interface Asset {
   id: string;
@@ -23,19 +24,19 @@ interface Asset {
 }
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
 export async function generateMetadata({ params }: PageProps) {
-  const { id } = await params
+  const { id } = params
   return {
     title: `Asset ${id}`,
   }
 }
 
 export default async function AssetPage(props: PageProps) {
-  const { id } = await props.params
+  const { id } = props.params
   let asset: Asset | null = null
 
   try {
@@ -128,6 +129,7 @@ export default async function AssetPage(props: PageProps) {
               <div>
                 <h2 className="text-xl font-semibold mb-2">Royalty</h2>
                 <p className="text-2xl font-bold">${asset.price}</p>
+                <WaitlistButton assetId={asset.id} />
               </div>
 
               <div>

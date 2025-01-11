@@ -23,7 +23,7 @@ export function ComingSoon() {
           We're working hard to bring you something amazing. Stay tuned for updates!
         </p>
 
-        <div className="w-full max-w-md mx-auto">
+        {/* <div className="w-full max-w-md mx-auto">
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
             <Input
               type="email"
@@ -37,7 +37,7 @@ export function ComingSoon() {
               Notify Me
             </Button>
           </form>
-        </div>
+        </div> */}
 
         {/* <div className="pt-8">
           <div className="flex justify-center gap-8">
