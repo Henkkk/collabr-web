@@ -46,12 +46,12 @@ export default async function AssetPage(props: Props) {
     if (assetDoc.exists()) {
       const data = assetDoc.data()
 
-      console.log(data);
+      console.log("data", data);
 
       asset = {
         id: assetDoc.id,
         title: String(data.title || ''),
-        description: String(data.description || ''),
+        description: String(data.description || 'N/A'),
         imageURL: String(data.imageURL || ''),
         creator: String(data.creator_name || ''),
         price: Number(data.price || 0),
@@ -120,7 +120,7 @@ export default async function AssetPage(props: Props) {
             <div className="space-y-6">
               <div>
                 <h1 className="text-3xl font-bold mb-2">{asset.title}</h1>
-                <p className="text-gray-600">Asset owner: {asset.creator}</p>
+                {/* <p className="text-gray-600">Asset owner: {asset.creator}</p> */}
               </div>
 
               <div>
