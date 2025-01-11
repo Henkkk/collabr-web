@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react"
 import Navbar from "@/components/ui/navbar";
 import Footer from "@/components/ui/footer";
 import Web3Providers from "./Web3Providers";
@@ -24,6 +25,7 @@ export default function RootLayout({
           <Navbar />
           <main className="flex-grow">
             {children}
+            <Analytics />
           </main>
           <Footer />
         </Web3Providers>
