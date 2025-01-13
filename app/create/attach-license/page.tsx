@@ -21,8 +21,6 @@ const SUPPORTED_CURRENCIES = [
   'ADA',
   'SOL',
   'DOT',
-  'DOGE',
-  'MATIC'
 ] as const;
 export type SupportedCurrency = typeof SUPPORTED_CURRENCIES[number];
 const initDB = async () => {
@@ -84,7 +82,6 @@ export default function AttachLicensePage() {
             await uploadString(imageRef, assetImage, 'data_url');
             const imageURL = await getDownloadURL(imageRef);
 
-            // Convert BigInt values to strings and ensure proper data types
             const sanitizedPilTerms = {
                 ...pilTerms,
                 derivativeRevCeiling: Number(pilTerms.derivativeRevCeiling) || 0,

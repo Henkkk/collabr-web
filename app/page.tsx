@@ -6,31 +6,43 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { ComingSoon } from '@/components/ui/coming-soon'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
-import sampleNFT1 from '@/media/nft_soccer.jpeg'
-import sampleNFT2 from '@/media/nft_scifi.jpeg'
-import sampleNFT3 from '@/media/nft_dragon.jpeg'
-import sampleNFT4 from '@/media/nft_yosemite.jpeg'
+import s1_d1 from '@/media/s1_d1.jpg'
+import s2_d1 from '@/media/s2_d1.jpg'
+import s3_d1 from '@/media/s3_d1.jpg'
+import s4_d1 from '@/media/s4_d1.jpg'
+import s5_d1 from '@/media/s5_d1.jpg'
+import s6_d1 from '@/media/s6_d1.jpg'
+import s7_d1 from '@/media/s7_d1.jpg'
+import s8_d1 from '@/media/s8_d1.jpg'
+import s9 from '@/media/s9.jpeg'
+import samplenft1 from '@/media/0bvq0u5v167e1.png'
+import samplenft2 from '@/media/gld3sek33ube1.jpeg'
+import samplenft3 from '@/media/this-is-my-nebula-nix-nfts-hope-you-like-it-v0-waicaeavekbe1.jpeg'
+import samplenft4 from '@/media/w7r1my1sknbe1.jpeg'
+import samplenft5 from '@/media/what-you-think-v0-ew6yvt962f9e1.jpeg'
+import samplenft6 from '@/media/new-nft-on-opensea-v0-6egrva7tn86e1.jpeg'
+
 
 const featuredNFTs = [
-  { id: 1, name: "Cosmic Voyage #42", creator: "StarGazer", price: "0.5 ETH", image: sampleNFT1 },
-  { id: 2, name: "Digital Dreamscape", creator: "PixelPioneer", price: "0.8 ETH", image: sampleNFT2 },
-  { id: 3, name: "Neon Nebula", creator: "CyberArtist", price: "0.6 ETH", image: sampleNFT3 },
-  { id: 4, name: "Quantum Quill", creator: "ByteBard", price: "0.7 ETH", image: sampleNFT4 },
-  { id: 5, name: "Ethereal Echo", creator: "SonicSculptor", price: "0.9 ETH", image: "/placeholder.svg?height=400&width=400" },
-  { id: 6, name: "Pixel Phoenix", creator: "DigitalPhoenix", price: "1.2 ETH", image: "/placeholder.svg?height=400&width=400" },
+  { id: 1, name: "Great Sushi Dragon Pullover Hoodie", creator: "studioIlustrata", price: "0.016 ETH", image: s7_d1 },
+  { id: 2, name: "Great Sushi Dragon Classic T-Shirt", creator: "studioIlustrata", price: "0.007 ETH", image: s2_d1 },
+  { id: 3, name: "The black Great Ramen Scarf", creator: "studioIlustrata", price: "0.012 ETH", image: s8_d1 },
+  { id: 4, name: "Bones and Botany Cap", creator: "E Moss", price: "0.0077 ETH", image: s4_d1 },
+  { id: 5, name: "Too Many Birds! Bird Squad Classic Tote Bag", creator: "SonicSculptor", price: "0.9 ETH", image: s5_d1 },
+  { id: 6, name: "Sushi cats Socks", creator: "lunaticpark", price: "0.0052 ETH", image: s6_d1 },
 ]
 
 const topEarningNFTs = [
-  { id: 7, name: "Golden Meme #1", creator: "MemeKing", earnings: "100 ETH", percentageChange: 12.5, image: sampleNFT1 },
-  { id: 8, name: "Crypto Kitty #42", creator: "BlockchainBreeder", earnings: "75 ETH", percentageChange: -5.2, image: sampleNFT2 },
-  { id: 9, name: "Bored Ape #007", creator: "ApeMaster", earnings: "50 ETH", percentageChange: 8.7, image: sampleNFT3 },
-  { id: 10, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: sampleNFT4 },
-  { id: 11, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: sampleNFT4 },
-  { id: 12, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: sampleNFT4 },
-  { id: 13, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: sampleNFT4 },
-  { id: 14, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: sampleNFT4 },
-  { id: 15, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: sampleNFT4 },
-  { id: 16, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: sampleNFT4 },
+  { id: 7, name: "Drago Sushi", creator: "studioIlustrata", earnings: "8.12 ETH", percentageChange: 12.5, image: s9 },
+  { id: 8, name: "Crypto Kitty #42", creator: "BlockchainBreeder", earnings: "75 ETH", percentageChange: -5.2, image: samplenft1 },
+  { id: 9, name: "Bored Ape #007", creator: "ApeMaster", earnings: "50 ETH", percentageChange: 8.7, image: samplenft2 },
+  { id: 10, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: samplenft3 },
+  { id: 11, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: samplenft4 },
+  { id: 12, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: samplenft5 },
+  { id: 13, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: samplenft6 },
+  { id: 14, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: s4_d1 },
+  { id: 15, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: s4_d1 },
+  { id: 16, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: s4_d1 },
 ]
 
 export default function HomePage() {
@@ -83,6 +95,7 @@ export default function HomePage() {
     //               </CardHeader>
     //               <CardContent>
     //                 <p className="truncate">Creator: {nft.creator}</p>
+    //                 <p className="truncate">Price: {nft.price}</p>
     //               </CardContent>
     //             </div>
     //           </Card>
@@ -100,7 +113,7 @@ export default function HomePage() {
     //   </section>
 
     //   <section className="mb-16">
-    //     <h2 className="text-3xl font-bold mb-8">Top Earning NFTs</h2>
+    //     <h2 className="text-3xl font-bold mb-8">Top Earning Assets</h2>
     //     <div className="grid gap-6">
     //       <div className="flex items-center p-4 text-sm font-semibold text-gray-500">
     //         <div className="flex-shrink-0 mr-4 w-16">Rank</div>

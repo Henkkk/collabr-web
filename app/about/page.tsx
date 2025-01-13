@@ -2,26 +2,45 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">About Collabr</h1>
-          <p className="text-xl text-gray-600">
-            A marketplace for commercial your NFTs
-          </p>
-        </div>
-
         {/* Content Sections */}
-        <div className="grid gap-12">
-          {/* Mission Section */}
-          <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Our Mission</h2>
-            <p className="text-gray-600">
-              We strive to create a future for Web3 creators to continue to strive
-            </p>
-          </section>
+        <p className="mb-6">
+          Collabr is a marketplace where you can list your NFTs and allow others to create derivative works.
+          These derivative works can include both physical and digital products — from a T-shirt to another piece of digital art.
+          We make this possible by enabling you to create licenses for your NFTs. These licenses include simple terms that allow you 
+          to specify who can remix, monetize, and create derivatives of your NFTs, as well as set the associated costs.
+          We put the business logic on-chain to automate & enforce those terms.
+        </p>
 
+        <p className="mb-6">
+          We understand that as an artist or creator, you may have little time to promote or market your work.
+          That's why we connect you with others who are interested in marketing and business, helping you grow your community, and we call them "remixer".
+        </p>
+
+        <p className="mb-6">
+          How do we make money? We take 2.5% commission fees from each sales.
+        </p>
+
+        <p className="mb-6">
+          We're excited to see how you use Collabr to grow your community and continue to create amazing works.
+        </p>
+
+        <p className="mb-6">
+          Connect with us on X <a href="https://x.com/wingfungyeung" className="text-blue-500 hover:text-blue-600">@wingfungyeung</a>, 
+          <a href="https://x.com/DavidSlakter" className="text-blue-500 hover:text-blue-600">@DavidSlakter
+          </a>
+        </p>
+
+        <p>
+          Henry Yeung & David Slakter
+        </p>
+
+        <p className="mb-6">
+          @Founders of Collabr
+        </p>
+
+        <div className="grid gap-12">
           {/* How it Works Section */}
-          <section>
+          {/* <section>
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">How it Works</h2>
             <div className="grid md:grid-cols-3 gap-8">
               <div>
@@ -52,10 +71,10 @@ export default function AboutPage() {
                 </p>
               </div>
             </div>
-          </section>
+          </section> */}
 
           {/* Team/Values Section */}
-          <section className="grid md:grid-cols-2 gap-8">
+          {/* <section className="grid md:grid-cols-2 gap-8">
             <div>
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">Our Team</h2>
               <p className="text-gray-600 mb-4">
@@ -86,10 +105,10 @@ export default function AboutPage() {
                 </a>
               </div>
             </div>
-          </section>
+          </section> */}
 
           {/* Contact Section */}
-          <section className="bg-gray-50 p-8 rounded-lg">
+          {/* <section className="bg-gray-50 p-8 rounded-lg">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Get in Touch</h2>
             <p className="text-gray-600 mb-4">
               We'd love to hear from you. Reach out to us to learn more about our work
@@ -111,7 +130,7 @@ export default function AboutPage() {
                 Join our Discord community
               </a>
             </div>
-          </section>
+          </section> */}
         </div>
       </div>
     </main>

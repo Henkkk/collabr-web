@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "script": "ts-node scripts/seed-ipa-data.ts"
   },
   "dependencies": {
     "@dynamic-labs/algorand": "^3.0.2",
@@ -45,6 +46,8 @@
     "clsx": "^2.1.1",
     "crypto-js": "^4.2.0",
     "firebase": "^11.1.0",
+    "firebase-admin": "^13.0.2",
+    "framer-motion": "^11.17.0",
     "lucide-react": "^0.441.0",
     "next": "^15.1.3",
     "pinata": "^1.2.0",
@@ -53,6 +56,7 @@
     "react-dom": "^18",
     "react-dropzone": "^14.2.6",
     "react-hook-form": "^7.53.0",
+    "react-icons": "^5.4.0",
     "react-router-dom": "^6.26.2",
     "supabase": "^1.192.5",
     "tailwind-merge": "^2.6.0",
@@ -64,7 +68,7 @@
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
-    "@types/node": "^20",
+    "@types/node": "^20.17.12",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/uuid": "^10.0.0",
@@ -73,6 +77,7 @@
     "pino-pretty": "^13.0.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
   }
 }
