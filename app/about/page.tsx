@@ -1,9 +1,9 @@
 export default function AboutPage() {
   return (
-    <main className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen py-8 px-4 sm:py-12 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Content Sections */}
-        <p className="mb-6">
+        <p className="mb-4 sm:mb-6 text-sm sm:text-base">
           Collabr is a marketplace where you can list your NFTs and allow others to create derivative works.
           These derivative works can include both physical and digital products — from a T-shirt to another piece of digital art.
           We make this possible by enabling you to create licenses for your NFTs. These licenses include simple terms that allow you 
@@ -11,30 +11,29 @@ export default function AboutPage() {
           We put the business logic on-chain to automate & enforce those terms.
         </p>
 
-        <p className="mb-6">
+        <p className="mb-4 sm:mb-6 text-sm sm:text-base">
           We understand that as an artist or creator, you may have little time to promote or market your work.
           That's why we connect you with others who are interested in marketing and business, helping you grow your community, and we call them "remixer".
         </p>
 
-        <p className="mb-6">
+        <p className="mb-4 sm:mb-6 text-sm sm:text-base">
           How do we make money? We take 2.5% commission fees from each sales.
         </p>
 
-        <p className="mb-6">
+        <p className="mb-4 sm:mb-6 text-sm sm:text-base">
           We're excited to see how you use Collabr to grow your community and continue to create amazing works.
         </p>
 
-        <p className="mb-6">
-          Connect with us on X <a href="https://x.com/wingfungyeung" className="text-blue-500 hover:text-blue-600">@wingfungyeung</a>, 
-          <a href="https://x.com/DavidSlakter" className="text-blue-500 hover:text-blue-600">@DavidSlakter
-          </a>
+        <p className="mb-4 sm:mb-6 text-sm sm:text-base">
+          Connect with us on X <a href="https://x.com/wingfungyeung" className="text-blue-500 hover:text-blue-600 px-1">@wingfungyeung</a>, 
+          <a href="https://x.com/DavidSlakter" className="text-blue-500 hover:text-blue-600 px-1">@DavidSlakter</a>
         </p>
 
-        <p>
+        <p className="text-sm sm:text-base">
           Henry Yeung & David Slakter
         </p>
 
-        <p className="mb-6">
+        <p className="mb-4 sm:mb-6 text-sm sm:text-base">
           @Founders of Collabr
         </p>
 

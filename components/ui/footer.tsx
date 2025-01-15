@@ -19,13 +19,13 @@ const Footer = () => {
               About
             </Link>
             <Link 
-              href="/privacy"
+              href="/privacy-policy"
               className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
               Privacy
             </Link>
             <Link 
-              href="/terms"
+              href="/terms-of-use"
               className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
               Terms
