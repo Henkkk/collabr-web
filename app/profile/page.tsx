@@ -9,6 +9,7 @@ import { db } from '@/lib/firebase'
 import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firestore'
 import { EditProfileDialog } from '@/components/ui/edit-profile-dialog'
 import { useRouter } from 'next/navigation'
+import DefaultProfilePicture from '@/media/Default-Profile-Picture.png'
 
 interface UserProfile {
   user_name: string
@@ -56,6 +57,8 @@ export default function ProfilePage() {
       if (!querySnapshot.empty) {
         const userDoc = querySnapshot.docs[0];
         const userData = userDoc.data();
+
+        //console.log("userData", userData);
         
         setUser({
           user_name: userData.creator_name || '',
@@ -158,7 +161,7 @@ export default function ProfilePage() {
               />
             ) : (
               <Image
-                src="/placeholder-avatar.png"
+                src={DefaultProfilePicture}
                 alt="Default Profile Picture"
                 fill
                 className="rounded-full object-cover"
