@@ -74,13 +74,21 @@ export function ComingSoon() {
           We're crafting a revolutionary platform that will transform how creators monetize their NFTs. Join our waitlist to be the first to know when we have updates.
         </p>
 
-        <div className="text-center">
+        <div className="text-center space-y-2">
             <a 
               href="/about" 
               className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline underline-offset-2"
             >
               Learn more about what we're building →
             </a>
+            <div>
+              <a 
+                href="/faq" 
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 underline underline-offset-2"
+              >
+                Frequently Asked Questions →
+              </a>
+            </div>
         </div>
 
         <div className="w-full max-w-md mx-auto px-2 sm:px-0">
