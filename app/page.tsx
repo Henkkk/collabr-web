@@ -3,250 +3,160 @@ import { useRef } from 'react'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ComingSoon } from '@/components/ui/coming-soon'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
-import s1_d1 from '@/media/s1_d1.jpg'
-import s2_d1 from '@/media/s2_d1.jpg'
-import s3_d1 from '@/media/s3_d1.jpg'
-import s4_d1 from '@/media/s4_d1.jpg'
-import s5_d1 from '@/media/s5_d1.jpg'
-import s6_d1 from '@/media/s6_d1.jpg'
-import s7_d1 from '@/media/s7_d1.jpg'
-import s8_d1 from '@/media/s8_d1.jpg'
-import s9 from '@/media/s9.jpeg'
-import samplenft1 from '@/media/0bvq0u5v167e1.png'
-import samplenft2 from '@/media/gld3sek33ube1.jpeg'
-import samplenft3 from '@/media/this-is-my-nebula-nix-nfts-hope-you-like-it-v0-waicaeavekbe1.jpeg'
-import samplenft4 from '@/media/w7r1my1sknbe1.jpeg'
-import samplenft5 from '@/media/what-you-think-v0-ew6yvt962f9e1.jpeg'
-import samplenft6 from '@/media/new-nft-on-opensea-v0-6egrva7tn86e1.jpeg'
+import IPA1 from '@/media/IPA-001.jpeg'
+import IPA2 from '@/media/IPA-002.jpeg'
+import IPA3 from '@/media/IPA-003.jpg'
+import IPA4 from '@/media/IPA-004.jpeg'
+import IPA5 from '@/media/IPA-005.jpeg'
+import IPA6 from '@/media/IPA-006.jpeg'
+import IPD1 from '@/media/IPD-001.jpeg'
+import IPD2 from '@/media/IPD-002.jpeg'
+import IPD3 from '@/media/IPD-003.jpeg'
+import IPD4 from '@/media/IPD-004.png'
+import IPD5 from '@/media/IPD-005.png'
+import IPD6 from '@/media/IPD-006.jpeg'
+import IPD7 from '@/media/IPD-007.jpeg'
+import IPD8 from '@/media/IPD-008.jpeg'
+import IPD9 from '@/media/IPD-009.jpeg'
+import IPD10 from '@/media/IPD-010.jpeg'
 
-
-const featuredNFTs = [
-  { id: 1, name: "Great Sushi Dragon Pullover Hoodie", creator: "studioIlustrata", price: "0.016 ETH", image: s7_d1 },
-  { id: 2, name: "Great Sushi Dragon Classic T-Shirt", creator: "studioIlustrata", price: "0.007 ETH", image: s2_d1 },
-  { id: 3, name: "The black Great Ramen Scarf", creator: "studioIlustrata", price: "0.012 ETH", image: s8_d1 },
-  { id: 4, name: "Bones and Botany Cap", creator: "E Moss", price: "0.0077 ETH", image: s4_d1 },
-  { id: 5, name: "Too Many Birds! Bird Squad Classic Tote Bag", creator: "SonicSculptor", price: "0.9 ETH", image: s5_d1 },
-  { id: 6, name: "Sushi cats Socks", creator: "lunaticpark", price: "0.0052 ETH", image: s6_d1 },
+// Temporary mock data - replace with real data later
+const selectedIPA = [
+  { id: 1, title: 'Rumors of Arctic Belonging - Blanket Toss, Nalukataq', image: IPA1, creator: 'Quantum-Art-Curator', price: '0.1168 ETH', URL: 'https://opensea.io/assets/ethereum/0x46ac8540d698167fcbb9e846511beb8cf8af9bd8/90073'},
+  { id: 2, title: 'outcast #246', image: IPA2, creator: 'sumgarg', price: '0.1169 ETH', URL: 'https://opensea.io/assets/base/0x73682a7f47cb707c52cb38192dbb9266d3220315/187'},
+  { id: 3, title: 'Big Fish', image: IPA3, creator: 'ArturFalcao', price: '2168.03 USDC', URL: 'https://opensea.io/assets/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/26414233136229351194350431839875315045969147529690843074174196343275207524353'},
+  { id: 4, title: 'The Terminal', image: IPA4, creator: 'diberkato', price: '1 ETH', URL:'https://superrare.com/artwork/eth/0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0/29642'},
+  { id: 5, title: 'On Some High', image: IPA5, creator: 'Alex Mack', price: '0.0097 ETH', URL: 'https://opensea.io/assets/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/9366421738142329838550851251409044944958925912594148577839686531771455766529'},
+  { id: 6, title: 'Donita Sparks, L7: Coconut Teazer, Los Angeles, 1990.', image: IPA6, creator: 'phosphene', price: '0 ETH', URL: 'https://opensea.io/assets/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/24460042610638516058947371250238633898033226268786963695065259084724461109249'},
 ]
 
-const topEarningNFTs = [
-  { id: 7, name: "Drago Sushi", creator: "studioIlustrata", earnings: "8.12 ETH", percentageChange: 12.5, image: s9 },
-  { id: 8, name: "Crypto Kitty #42", creator: "BlockchainBreeder", earnings: "75 ETH", percentageChange: -5.2, image: samplenft1 },
-  { id: 9, name: "Bored Ape #007", creator: "ApeMaster", earnings: "50 ETH", percentageChange: 8.7, image: samplenft2 },
-  { id: 10, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: samplenft3 },
-  { id: 11, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: samplenft4 },
-  { id: 12, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: samplenft5 },
-  { id: 13, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: samplenft6 },
-  { id: 14, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: s4_d1 },
-  { id: 15, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: s4_d1 },
-  { id: 16, name: "Decentraland Plot #X", creator: "VirtualRealtor", earnings: "40 ETH", percentageChange: -2.3, image: s4_d1 },
+const topSelling = [
+  { id: 1, title: 'Deysi Vinyl', image: IPD1, price: '$185', URL: 'https://www.doodles.app/shop/product/deysi-vinyl'},
+  { id: 2, title: 'Doodles x Crocs Jibbitz', image: IPD2, price: '$20', URL: 'https://www.doodles.app/shop/product/jibbitz-pack'},
+  { id: 3, title: 'Adidas Originals x Doodles Tee', image: IPD3, price: '$55', URL: 'https://www.doodles.app/shop/product/doodles-x-adidas-tee'},
+  { id: 4, title: 'Polar Bear Plushie', image: IPD4, price: '$29.99', URL: 'https://shop.pudgypenguins.com/products/polar-bear-plushie'},
+  { id: 5, title: 'PUDGY PINS (PACK OF 6)', image: IPD5, price: '$39.99', URL: 'https://shop.pudgypenguins.com/products/pins-pack-of-6'},
+  { id: 6, title: 'Kanpai Pandas - Essential Tee - Storm', image: IPD6, price: '$50', URL: 'https://wearkc.com/collections/new-items/products/copy-of-essential-tee-2'},
+  { id: 7, title: 'Sappy Seals - Custom Hoodie - Black', image: IPD7, price: '$74.99', URL: 'https://shop.sappyseals.com/products/custom-hoodie-black'},
+  { id: 8, title: 'Chugs Embroidered Beanie', image: IPD8, price: '$25.00', URL: 'https://store.coolcats.com/products/chugs-embroidered-beanie'},
+  { id: 9, title: 'Blue Cat Plush', image: IPD9, price: '$35.00', URL: 'https://store.coolcats.com/products/blue-cat-plush'},
+  { id: 10, title: 'BASTARD GAN PUNK V2 #10104', image: IPD10, price: '0.202 ETH', URL: 'https://opensea.io/assets/ethereum/0x31385d3520bced94f77aae104b406994d8f2168c/10104'},
 ]
 
 export default function HomePage() {
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const carouselRef = useRef<HTMLDivElement>(null)
 
   const scroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 300
-      scrollContainerRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      })
+    if (carouselRef.current) {
+      const { current } = carouselRef
+      const scrollAmount = direction === 'left' ? -current.offsetWidth : current.offsetWidth
+      current.scrollBy({ left: scrollAmount, behavior: 'smooth' })
     }
   }
 
   return (
-    <ComingSoon />
-    // <div className="container mx-auto px-4 py-8">
-    //   <section className="mb-16">
-    //     <div className="relative">
-    //       <Button 
-    //         variant="outline" 
-    //         size="icon" 
-    //         className="absolute left-0 top-1/2 -translate-y-1/2 z-10"
-    //         onClick={() => scroll('left')}
-    //       >
-    //         <ChevronLeft className="h-4 w-4" />
-    //       </Button>
-    //       <div 
-    //         ref={scrollContainerRef}
-    //         className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide"
-    //         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-    //       >
-    //         {featuredNFTs.map((nft) => (
-    //           <Card key={nft.id} className="w-72 h-96 flex-shrink-0 relative overflow-hidden">
-    //             {typeof nft.image === 'string' ? (
-    //               <img src={nft.image} alt={nft.name} className="absolute inset-0 w-full h-full object-cover" />
-    //             ) : (
-    //               <Image 
-    //                 src={nft.image} 
-    //                 alt={nft.name} 
-    //                 width={400} 
-    //                 height={400} 
-    //                 className="absolute inset-0 w-full h-full object-cover"
-    //               />
-    //             )}
-    //             <div className="absolute bottom-0 left-0 right-0 z-10 text-white bg-black/20 backdrop-blur-sm">
-    //               <CardHeader className="pb-2">
-    //                 <CardTitle className="truncate">{nft.name}</CardTitle>
-    //               </CardHeader>
-    //               <CardContent>
-    //                 <p className="truncate">Creator: {nft.creator}</p>
-    //                 <p className="truncate">Price: {nft.price}</p>
-    //               </CardContent>
-    //             </div>
-    //           </Card>
-    //         ))}
-    //       </div>
-    //       <Button 
-    //         variant="outline" 
-    //         size="icon" 
-    //         className="absolute right-0 top-1/2 -translate-y-1/2 z-10"
-    //         onClick={() => scroll('right')}
-    //       >
-    //         <ChevronRight className="h-4 w-4" />
-    //       </Button>
-    //     </div>
-    //   </section>
+    <main className="min-h-screen">
+      {/* Popular NFTs Carousel Section */}
+      <section className="relative py-4 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="relative group">
+            <div
+              ref={carouselRef}
+              className="flex overflow-x-auto gap-6 pb-4 snap-x snap-mandatory scrollbar-hide"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {selectedIPA.map((ipa) => (
+                <div key={ipa.id} className="flex-none w-80 snap-start">
+                  <Card className="h-full hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+                    <Link href={ipa.URL} target="_blank" rel="noopener noreferrer">
+                      <div className="relative h-full cursor-pointer">
+                        <Image
+                          src={ipa.image}
+                          alt={ipa.title}
+                          width={500}
+                          height={500}
+                          className="object-cover w-full h-full"
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                          <h3 className="font-semibold text-lg">{ipa.title}</h3>
+                          <p className="text-sm text-gray-200">{ipa.creator}</p>
+                        </div>
+                      </div>
+                    </Link>
+                  </Card>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => scroll('left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 bg-black/50 hover:bg-black/75 backdrop-blur-sm text-white rounded-r-xl p-3 shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => scroll('right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 bg-black/50 hover:bg-black/75 backdrop-blur-sm text-white rounded-l-xl p-3 shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
+              aria-label="Scroll right"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </section>
 
-    //   <section className="mb-16">
-    //     <h2 className="text-3xl font-bold mb-8">Top Earning Assets</h2>
-    //     <div className="grid gap-6">
-    //       <div className="flex items-center p-4 text-sm font-semibold text-gray-500">
-    //         <div className="flex-shrink-0 mr-4 w-16">Rank</div>
-    //         <div className="flex-grow">Asset</div>
-    //         <div className="text-right w-24">Earnings</div>
-    //       </div>
-          
-    //       {topEarningNFTs.map((nft, index) => (
-    //         <Card key={nft.id} className="flex items-center p-4">
-    //           <div className="flex-shrink-0 mr-4 w-16">
-    //             <span className="text-2xl font-bold">{index + 1}</span>
-    //           </div>
-    //           <div className="flex flex-grow items-center">
-    //             <div className="w-16 h-16 relative flex-shrink-0 mr-4">
-    //               {typeof nft.image === 'string' ? (
-    //                 <img 
-    //                   src={nft.image} 
-    //                   alt={nft.name} 
-    //                   className="absolute inset-0 w-full h-full object-cover rounded-md" 
-    //                 />
-    //               ) : (
-    //                 <Image 
-    //                   src={nft.image} 
-    //                   alt={nft.name} 
-    //                   fill
-    //                   className="object-cover rounded-md"
-    //                 />
-    //               )}
-    //             </div>
-    //             <div className="flex-grow">
-    //               <h3 className="font-semibold truncate">{nft.name}</h3>
-    //               <p className="text-sm text-gray-500 truncate">Creator: {nft.creator}</p>
-    //             </div>
-    //           </div>
-    //           <div className="text-right w-24">
-    //             <p className="font-semibold">{nft.earnings}</p>
-    //             <p className={`text-sm font-semibold ${nft.percentageChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-    //               {nft.percentageChange >= 0 ? '+' : ''}{nft.percentageChange}%
-    //             </p>
-    //           </div>
-    //         </Card>
-    //       ))}
-    //     </div>
-    //   </section>
+      {/* Top Selling Section */}
+      <section className="px-4 py-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl font-bold text-gray-900 mb-8">Top Selling Derivative Works</h2>
+          <div className="space-y-4">
+            {topSelling.map((nft, index) => (
+              <Card 
+                key={nft.id} 
+                className="transform transition-all duration-200 hover:scale-[1.02]"
+              >
+                <div className="flex items-center p-4 gap-6">
+                  {/* Rank Number */}
+                  <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-gray-900">{index + 1}</span>
+                  </div>
 
-    //   <section className="mb-16">
-    //     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-    //       <div>
-    //         <h3 className="text-xl font-semibold mb-4">Top Earning Artists</h3>
-    //         <div className="grid gap-4">
-    //           <div className="flex items-center p-4 text-sm font-semibold text-gray-500">
-    //             <div className="flex-shrink-0 mr-4 w-8">Rank</div>
-    //             <div className="flex-grow">Artist</div>
-    //             <div className="text-right w-24">Earnings</div>
-    //           </div>
-    //           {[
-    //             { id: 1, name: "PixelPioneer", earnings: "250 ETH", percentageChange: 15.2, image: "/placeholder.svg?height=100&width=100" },
-    //             { id: 2, name: "CyberArtist", earnings: "180 ETH", percentageChange: 8.7, image: "/placeholder.svg?height=100&width=100" },
-    //             { id: 3, name: "StarGazer", earnings: "150 ETH", percentageChange: -3.4, image: "/placeholder.svg?height=100&width=100" },
-    //             { id: 4, name: "ByteBard", earnings: "120 ETH", percentageChange: 5.6, image: "/placeholder.svg?height=100&width=100" },
-    //             { id: 5, name: "SonicSculptor", earnings: "90 ETH", percentageChange: 12.1, image: "/placeholder.svg?height=100&width=100" },
-    //           ].map((artist, index) => (
-    //             <Card key={artist.id} className="flex items-center p-4">
-    //               <div className="flex-shrink-0 mr-4 w-8">
-    //                 <span className="text-lg font-bold">{index + 1}</span>
-    //               </div>
-    //               <div className="flex flex-grow items-center">
-    //                 <div className="w-10 h-10 relative flex-shrink-0 mr-4">
-    //                   <img
-    //                     src={artist.image}
-    //                     alt={artist.name}
-    //                     className="rounded-full object-cover"
-    //                   />
-    //                 </div>
-    //                 <div className="flex-grow">
-    //                   <h4 className="font-semibold">{artist.name}</h4>
-    //                 </div>
-    //               </div>
-    //               <div className="text-right w-24">
-    //                 <p className="font-semibold">{artist.earnings}</p>
-    //                 <p className={`text-sm font-semibold ${artist.percentageChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-    //                   {artist.percentageChange >= 0 ? '+' : ''}{artist.percentageChange}%
-    //                 </p>
-    //               </div>
-    //             </Card>
-    //           ))}
-    //         </div>
-    //       </div>
+                  {/* NFT Image */}
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={nft.image}
+                      alt={nft.title}
+                      width={160}
+                      height={160}
+                      className="rounded-lg object-cover w-32 h-32 border-2 border-gray-200"
+                    />
+                  </div>
 
-    //       <div>
-    //         <h3 className="text-xl font-semibold mb-4">Top Earning Remixers</h3>
-    //         <div className="grid gap-4">
-    //           <div className="flex items-center p-4 text-sm font-semibold text-gray-500">
-    //             <div className="flex-shrink-0 mr-4 w-8">Rank</div>
-    //             <div className="flex-grow">Remixer</div>
-    //             <div className="text-right w-24">Earnings</div>
-    //           </div>
-    //           {[
-    //             { id: 1, name: "RemixMaster", earnings: "120 ETH", percentageChange: 20.5, image: "/placeholder.svg?height=100&width=100" },
-    //             { id: 2, name: "ArtAlchemist", earnings: "95 ETH", percentageChange: 15.8, image: "/placeholder.svg?height=100&width=100" },
-    //             { id: 3, name: "DigitalBlender", earnings: "80 ETH", percentageChange: -2.3, image: "/placeholder.svg?height=100&width=100" },
-    //             { id: 4, name: "NFTFusion", earnings: "65 ETH", percentageChange: 8.9, image: "/placeholder.svg?height=100&width=100" },
-    //             { id: 5, name: "MixedReality", earnings: "50 ETH", percentageChange: 4.2, image: "/placeholder.svg?height=100&width=100" },
-    //           ].map((remixer, index) => (
-    //             <Card key={remixer.id} className="flex items-center p-4">
-    //               <div className="flex-shrink-0 mr-4 w-8">
-    //                 <span className="text-lg font-bold">{index + 1}</span>
-    //               </div>
-    //               <div className="flex flex-grow items-center">
-    //                 <div className="w-10 h-10 relative flex-shrink-0 mr-4">
-    //                   <img
-    //                     src={remixer.image}
-    //                     alt={remixer.name}
-    //                     className="rounded-full object-cover"
-    //                   />
-    //                 </div>
-    //                 <div className="flex-grow">
-    //                   <h4 className="font-semibold">{remixer.name}</h4>
-    //                 </div>
-    //               </div>
-    //               <div className="text-right w-24">
-    //                 <p className="font-semibold">{remixer.earnings}</p>
-    //                 <p className={`text-sm font-semibold ${remixer.percentageChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-    //                   {remixer.percentageChange >= 0 ? '+' : ''}{remixer.percentageChange}%
-    //                 </p>
-    //               </div>
-    //             </Card>
-    //           ))}
-    //         </div>
-    //       </div>
-    //     </div>
-    //   </section>
-    // </div>
+                  {/* NFT Details */}
+                  <div className="flex-grow">
+                    <h3 className="font-semibold text-lg">{nft.title}</h3>
+                    <div className="flex items-center gap-4 mt-2">
+                      <p className="text-sm font-medium">{nft.price}</p>
+                    </div>
+                  </div>
+
+                  {/* Action Button */}
+                  <div className="flex-shrink-0">
+                    <Button asChild>
+                      <a href={nft.URL} target="_blank" rel="noopener noreferrer">
+                        View Details
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+    </main>
   )
 }
 

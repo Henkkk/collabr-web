@@ -25,6 +25,12 @@ export default function Navbar(){
                 </div>
 
                 <div className="flex-shrink-0 flex items-center">
+                    <Link href="/about" className="mr-6 text-gray-600 hover:text-black">
+                        About
+                    </Link>
+                    <Link href="/faq" className="mr-6 text-gray-600 hover:text-black">
+                        FAQ
+                    </Link>
                     <ConnectWallet/>
                     {primaryWallet && (
                         <>
