@@ -33,7 +33,7 @@ function WalletConnectWrapper() {
 
   return (
     <div>
-      <DynamicWidget/>
+      <DynamicWidget />
     </div>
   );
 }

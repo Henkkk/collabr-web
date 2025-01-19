@@ -12,7 +12,7 @@ export default function Navbar(){
     <nav className="bg-white text-black shadow-sm sticky top-0 z-50">
         <div className="container mx-auto">
             <div className="flex items-center content-center justify-between h-16">
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 flex items-center">
                     <Link href="/" className="text-2xl font-bold flex items-center gap-2">
                         <Image 
                             src={logo}
@@ -22,15 +22,15 @@ export default function Navbar(){
                         />
                         Collabr
                     </Link>
+                    <Link href="/about" className="ml-6 text-gray-600 hover:text-black">
+                        About
+                    </Link>
+                    <Link href="/faq" className="ml-6 text-gray-600 hover:text-black">
+                        FAQ
+                    </Link>
                 </div>
 
                 <div className="flex-shrink-0 flex items-center">
-                    <Link href="/about" className="mr-6 text-gray-600 hover:text-black">
-                        About
-                    </Link>
-                    <Link href="/faq" className="mr-6 text-gray-600 hover:text-black">
-                        FAQ
-                    </Link>
                     <ConnectWallet/>
                     {primaryWallet && (
                         <>

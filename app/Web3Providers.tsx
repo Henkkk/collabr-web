@@ -53,14 +53,16 @@ const evmNetworks = [
   },
 ];
 
+//environmentId: "52436b8b-d6b1-4db4-9fa3-5a09de7ab37d",
+
 function ClientProviders({ children }: PropsWithChildren) {
   return (
     <QueryClientProvider client={queryClient}>
       <DynamicContextProvider
-        theme='dark'
+        theme='light'
         settings={{
           appName: "Collabr",
-          environmentId: "c78637eb-1176-40f1-9d5a-71d9993f77b6",
+          environmentId: "52436b8b-d6b1-4db4-9fa3-5a09de7ab37d",
           networkValidationMode: "always",
           walletConnectors: [EthereumWalletConnectors],
           overrides: { evmNetworks }
