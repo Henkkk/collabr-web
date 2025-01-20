@@ -60,7 +60,7 @@ function ClientProviders({ children }: PropsWithChildren) {
     <QueryClientProvider client={queryClient}>
       <DynamicContextProvider
         theme='light'
-        settings={{
+        settings={{ 
           appName: "Collabr",
           environmentId: "52436b8b-d6b1-4db4-9fa3-5a09de7ab37d",
           networkValidationMode: "always",

@@ -25,6 +25,9 @@ export default function Navbar(){
                     <Link href="/about" className="ml-6 text-gray-600 hover:text-black">
                         About
                     </Link>
+                    <Link href="/discover" className="ml-6 text-gray-600 hover:text-black">
+                        Discover
+                    </Link>
                     <Link href="/faq" className="ml-6 text-gray-600 hover:text-black">
                         FAQ
                     </Link>

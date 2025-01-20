@@ -7,7 +7,7 @@ import { FaTwitter, FaDiscord, FaLinkedin } from "react-icons/fa"
 import { db } from "@/lib/firebase"
 import { collection, addDoc, serverTimestamp } from "firebase/firestore"
 
-export function ComingSoon() {
+export default function ComingSoon() {
   const [email, setEmail] = useState("")
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [error, setError] = useState("")

@@ -21,6 +21,7 @@ import IPD7 from '@/media/IPD-007.jpeg'
 import IPD8 from '@/media/IPD-008.jpeg'
 import IPD9 from '@/media/IPD-009.jpeg'
 import IPD10 from '@/media/IPD-010.jpeg'
+import ComingSoon from '@/components/ui/coming-soon'
 
 // Temporary mock data - replace with real data later
 const selectedIPA = [
@@ -58,7 +59,9 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen">
-      {/* Popular NFTs Carousel Section */}
+      <ComingSoon/>
+      {/*
+      <ComingSoon/>
       <section className="relative py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="relative group">
@@ -106,8 +109,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+       */}
 
-      {/* Top Selling Section */}
+      {/*
       <section className="px-4 py-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">Top Selling Derivative Works</h2>
@@ -118,12 +122,10 @@ export default function HomePage() {
                 className="transform transition-all duration-200 hover:scale-[1.02]"
               >
                 <div className="flex items-center p-4 gap-6">
-                  {/* Rank Number */}
                   <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center">
                     <span className="text-2xl font-bold text-gray-900">{index + 1}</span>
                   </div>
 
-                  {/* NFT Image */}
                   <div className="flex-shrink-0">
                     <Image
                       src={nft.image}
@@ -134,7 +136,6 @@ export default function HomePage() {
                     />
                   </div>
 
-                  {/* NFT Details */}
                   <div className="flex-grow">
                     <h3 className="font-semibold text-lg">{nft.title}</h3>
                     <div className="flex items-center gap-4 mt-2">
@@ -142,7 +143,6 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  {/* Action Button */}
                   <div className="flex-shrink-0">
                     <Button asChild>
                       <a href={nft.URL} target="_blank" rel="noopener noreferrer">
@@ -156,6 +156,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      */}
     </main>
   )
 }
