@@ -62,7 +62,7 @@ function ClientProviders({ children }: PropsWithChildren) {
         theme='light'
         settings={{ 
           appName: "Collabr",
-          environmentId: "52436b8b-d6b1-4db4-9fa3-5a09de7ab37d",
+          environmentId: "b359169a-acee-4c21-a45a-876d3b7b2306",
           networkValidationMode: "always",
           walletConnectors: [EthereumWalletConnectors],
           overrides: { evmNetworks }

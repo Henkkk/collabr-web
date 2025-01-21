@@ -9,7 +9,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore'
 import Image from 'next/image'
 import Link from 'next/link'
 import { X } from 'lucide-react'
-import DefaultImage from '@/media/Default-Profile-Picture.png'
+import DefaultIPAPictures from '@/media/Default-IPA-Picture.png'
 
 interface IPA {
   id: string
@@ -208,7 +208,7 @@ const DiscoverPage: React.FC = () => {
                       src={
                         !imageErrors[ipa.id] && isValidImageUrl(ipa.imageURL)
                           ? ipa.imageURL.replace(':443', '') // Remove the port number if present
-                          : DefaultImage
+                          : DefaultIPAPictures
                       }
                       alt={ipa.title}
                       fill
@@ -226,7 +226,7 @@ const DiscoverPage: React.FC = () => {
                           src={
                             creatorProfiles[ipa.creator]?.user_icon
                               ? creatorProfiles[ipa.creator].user_icon.replace(':443', '')
-                              : DefaultImage
+                              : DefaultIPAPictures
                           }
                           alt="Creator"
                           fill

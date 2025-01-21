@@ -59,7 +59,7 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen">
-      <ComingSoon/>
+      <ComingSoon/>-
       {/*
       <ComingSoon/>
       <section className="relative py-4 px-4 sm:px-6 lg:px-8">
