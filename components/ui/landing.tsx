@@ -1,5 +1,5 @@
 import React from 'react';
-import ConnectWallet from '../../components/ui/connect-wallet';
+import ConnectWallet from './connect-wallet';
 
 export default function LandingPage() {
   return (
@@ -40,28 +40,45 @@ export default function LandingPage() {
 
           {/* Right side - Demo Videos */}
           <div className="space-y-6">
-            <div className="aspect-video rounded-lg overflow-hidden shadow-lg">
-              <iframe
-                width="100%"
-                height="100%"
-                src="https://www.youtube.com/embed/tzEwyEFvPcQ"
-                title="Collabr Demo Video 1"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            <h3 className="text-xl font-bold relative">
+              <span className="bg-gradient-to-r from-purple-600 via-purple-400 to-purple-500 bg-clip-text text-transparent">
+                How to create an asset
+              </span>
+              <div className="absolute -bottom-1 left-0 w-1/3 h-0.5 bg-gradient-to-r from-purple-600 to-transparent"></div>
+            </h3>
+            <div style={{
+              position: 'relative', 
+              paddingBottom: '64.86486486486486%', 
+              height: 0,
+              borderRadius: '13px',
+              overflow: 'hidden'
+            }}>
+            <iframe 
+                src="https://www.loom.com/embed/f4f4a21e583d4844a63b04f2fd84d932?sid=b7386fe0-6ed8-4630-82ff-466221054e1c&hideEmbedTopBar=true"
+                allow="fullscreen"
                 allowFullScreen
-                className="w-full h-full"
+                style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}}
               />
             </div>
-            <div className="aspect-video rounded-lg overflow-hidden shadow-lg">
-              <iframe
-                width="100%"
-                height="100%"
-                src="https://www.youtube.com/embed/TFACQvLSNp0"
-                title="Collabr Demo Video 2"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+
+            <h3 className="text-xl font-bold relative">
+              <span className="bg-gradient-to-r from-indigo-600 via-indigo-400 to-indigo-500 bg-clip-text text-transparent">
+                How to create a remix
+              </span>
+              <div className="absolute -bottom-1 left-0 w-1/3 h-0.5 bg-gradient-to-r from-indigo-600 to-transparent"></div>
+            </h3>
+            <div style={{
+              position: 'relative', 
+              paddingBottom: '64.86486486486486%', 
+              height: 0,
+              borderRadius: '13px',
+              overflow: 'hidden'
+            }}>              
+            <iframe 
+                src="https://www.loom.com/embed/c01449543e52480d8734a2ec5d136c44?sid=efcbd303-b693-46c7-8657-78721703986f&hideEmbedTopBar=true"
+                allow="fullscreen"
                 allowFullScreen
-                className="w-full h-full"
+                style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}}
               />
             </div>
           </div>
@@ -69,4 +86,4 @@ export default function LandingPage() {
       </div>
     </div>
   );
-}
+} 

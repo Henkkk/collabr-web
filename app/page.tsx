@@ -21,7 +21,7 @@ import IPD7 from '@/media/IPD-007.jpeg'
 import IPD8 from '@/media/IPD-008.jpeg'
 import IPD9 from '@/media/IPD-009.jpeg'
 import IPD10 from '@/media/IPD-010.jpeg'
-import ComingSoon from '@/components/ui/coming-soon'
+import LandingPage from '@/components/ui/landing'
 
 // Temporary mock data - replace with real data later
 const selectedIPA = [
@@ -59,7 +59,7 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen">
-      <ComingSoon/>-
+      <LandingPage/>
       {/*
       <ComingSoon/>
       <section className="relative py-4 px-4 sm:px-6 lg:px-8">
