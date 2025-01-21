@@ -119,7 +119,7 @@ export default function ComingSoon() {
             <a href="#" className="text-gray-600 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">
               <FaTwitter size={24} />
             </a>
-            <a href="https://discord.gg/SrkpaJAG" className="text-gray-600 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">
+            <a href="https://discord.gg/H7P5AVQK" className="text-gray-600 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">
               <FaDiscord size={24} />
             </a>
             <a href="https://www.linkedin.com/company/collabrxyz/?viewAsMember=true" className="text-gray-600 hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">
