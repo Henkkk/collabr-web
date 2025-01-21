@@ -40,45 +40,26 @@ export default function LandingPage() {
 
           {/* Right side - Demo Videos */}
           <div className="space-y-6">
-            <h3 className="text-xl font-bold relative">
-              <span className="bg-gradient-to-r from-purple-600 via-purple-400 to-purple-500 bg-clip-text text-transparent">
-                How to create an asset
-              </span>
-              <div className="absolute -bottom-1 left-0 w-1/3 h-0.5 bg-gradient-to-r from-purple-600 to-transparent"></div>
-            </h3>
-            <div style={{
-              position: 'relative', 
-              paddingBottom: '64.86486486486486%', 
-              height: 0,
-              borderRadius: '13px',
-              overflow: 'hidden'
-            }}>
-            <iframe 
-                src="https://www.loom.com/embed/f4f4a21e583d4844a63b04f2fd84d932?sid=b7386fe0-6ed8-4630-82ff-466221054e1c&hideEmbedTopBar=true"
-                allow="fullscreen"
+            <div className="aspect-video rounded-lg overflow-hidden shadow-lg">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/TK_5csNAF5s?modestbranding=1&controls=0"
+                title="How to create an asset on Collabr"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
-                style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}}
+                className="w-full h-full"
               />
             </div>
-
-            <h3 className="text-xl font-bold relative">
-              <span className="bg-gradient-to-r from-indigo-600 via-indigo-400 to-indigo-500 bg-clip-text text-transparent">
-                How to create a remix
-              </span>
-              <div className="absolute -bottom-1 left-0 w-1/3 h-0.5 bg-gradient-to-r from-indigo-600 to-transparent"></div>
-            </h3>
-            <div style={{
-              position: 'relative', 
-              paddingBottom: '64.86486486486486%', 
-              height: 0,
-              borderRadius: '13px',
-              overflow: 'hidden'
-            }}>              
-            <iframe 
-                src="https://www.loom.com/embed/c01449543e52480d8734a2ec5d136c44?sid=efcbd303-b693-46c7-8657-78721703986f&hideEmbedTopBar=true"
-                allow="fullscreen"
+            <div className="aspect-video rounded-lg overflow-hidden shadow-lg">
+              <iframe
+                width="100%"
+                height="100%"
+                src="https://www.youtube.com/embed/a3yNVwgX5l0?modestbranding=1&controls=0"
+                title="How to create a remix on Collabr"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
-                style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}}
+                className="w-full h-full"
               />
             </div>
           </div>
