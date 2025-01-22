@@ -5,46 +5,45 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
-import IPA1 from '@/media/IPA-001.jpeg'
-import IPA2 from '@/media/IPA-002.jpeg'
-import IPA3 from '@/media/IPA-003.jpg'
-import IPA4 from '@/media/IPA-004.jpeg'
-import IPA5 from '@/media/IPA-005.jpeg'
-import IPA6 from '@/media/IPA-006.jpeg'
-import IPD1 from '@/media/IPD-001.jpeg'
-import IPD2 from '@/media/IPD-002.jpeg'
-import IPD3 from '@/media/IPD-003.jpeg'
-import IPD4 from '@/media/IPD-004.png'
-import IPD5 from '@/media/IPD-005.png'
-import IPD6 from '@/media/IPD-006.jpeg'
-import IPD7 from '@/media/IPD-007.jpeg'
-import IPD8 from '@/media/IPD-008.jpeg'
-import IPD9 from '@/media/IPD-009.jpeg'
-import IPD10 from '@/media/IPD-010.jpeg'
+// import IPA1 from '@/media/IPA-001.jpeg'
+// import IPA2 from '@/media/IPA-002.jpeg'
+// import IPA3 from '@/media/IPA-003.jpg'
+// import IPA4 from '@/media/IPA-004.jpeg'
+// import IPA5 from '@/media/IPA-005.jpeg'
+// import IPA6 from '@/media/IPA-006.jpeg'
+// import IPD1 from '@/media/IPD-001.jpeg'
+// import IPD2 from '@/media/IPD-002.jpeg'
+// import IPD3 from '@/media/IPD-003.jpeg'
+// import IPD4 from '@/media/IPD-004.png'
+// import IPD5 from '@/media/IPD-005.png'
+// import IPD6 from '@/media/IPD-006.jpeg'
+// import IPD7 from '@/media/IPD-007.jpeg'
+// import IPD8 from '@/media/IPD-008.jpeg'
+// import IPD9 from '@/media/IPD-009.jpeg'
+// import IPD10 from '@/media/IPD-010.jpeg'
 import LandingPage from '@/components/ui/landing'
 
-// Temporary mock data - replace with real data later
-const selectedIPA = [
-  { id: 1, title: 'Rumors of Arctic Belonging - Blanket Toss, Nalukataq', image: IPA1, creator: 'Quantum-Art-Curator', price: '0.1168 ETH', URL: 'https://opensea.io/assets/ethereum/0x46ac8540d698167fcbb9e846511beb8cf8af9bd8/90073'},
-  { id: 2, title: 'outcast #246', image: IPA2, creator: 'sumgarg', price: '0.1169 ETH', URL: 'https://opensea.io/assets/base/0x73682a7f47cb707c52cb38192dbb9266d3220315/187'},
-  { id: 3, title: 'Big Fish', image: IPA3, creator: 'ArturFalcao', price: '2168.03 USDC', URL: 'https://opensea.io/assets/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/26414233136229351194350431839875315045969147529690843074174196343275207524353'},
-  { id: 4, title: 'The Terminal', image: IPA4, creator: 'diberkato', price: '1 ETH', URL:'https://superrare.com/artwork/eth/0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0/29642'},
-  { id: 5, title: 'On Some High', image: IPA5, creator: 'Alex Mack', price: '0.0097 ETH', URL: 'https://opensea.io/assets/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/9366421738142329838550851251409044944958925912594148577839686531771455766529'},
-  { id: 6, title: 'Donita Sparks, L7: Coconut Teazer, Los Angeles, 1990.', image: IPA6, creator: 'phosphene', price: '0 ETH', URL: 'https://opensea.io/assets/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/24460042610638516058947371250238633898033226268786963695065259084724461109249'},
-]
+// const selectedIPA = [
+//   { id: 1, title: 'Rumors of Arctic Belonging - Blanket Toss, Nalukataq', image: IPA1, creator: 'Quantum-Art-Curator', price: '0.1168 ETH', URL: 'https://opensea.io/assets/ethereum/0x46ac8540d698167fcbb9e846511beb8cf8af9bd8/90073'},
+//   { id: 2, title: 'outcast #246', image: IPA2, creator: 'sumgarg', price: '0.1169 ETH', URL: 'https://opensea.io/assets/base/0x73682a7f47cb707c52cb38192dbb9266d3220315/187'},
+//   { id: 3, title: 'Big Fish', image: IPA3, creator: 'ArturFalcao', price: '2168.03 USDC', URL: 'https://opensea.io/assets/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/26414233136229351194350431839875315045969147529690843074174196343275207524353'},
+//   { id: 4, title: 'The Terminal', image: IPA4, creator: 'diberkato', price: '1 ETH', URL:'https://superrare.com/artwork/eth/0xb932a70a57673d89f4acffbe830e8ed7f75fb9e0/29642'},
+//   { id: 5, title: 'On Some High', image: IPA5, creator: 'Alex Mack', price: '0.0097 ETH', URL: 'https://opensea.io/assets/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/9366421738142329838550851251409044944958925912594148577839686531771455766529'},
+//   { id: 6, title: 'Donita Sparks, L7: Coconut Teazer, Los Angeles, 1990.', image: IPA6, creator: 'phosphene', price: '0 ETH', URL: 'https://opensea.io/assets/ethereum/0x495f947276749ce646f68ac8c248420045cb7b5e/24460042610638516058947371250238633898033226268786963695065259084724461109249'},
+// ]
 
-const topSelling = [
-  { id: 1, title: 'Deysi Vinyl', image: IPD1, price: '$185', URL: 'https://www.doodles.app/shop/product/deysi-vinyl'},
-  { id: 2, title: 'Doodles x Crocs Jibbitz', image: IPD2, price: '$20', URL: 'https://www.doodles.app/shop/product/jibbitz-pack'},
-  { id: 3, title: 'Adidas Originals x Doodles Tee', image: IPD3, price: '$55', URL: 'https://www.doodles.app/shop/product/doodles-x-adidas-tee'},
-  { id: 4, title: 'Polar Bear Plushie', image: IPD4, price: '$29.99', URL: 'https://shop.pudgypenguins.com/products/polar-bear-plushie'},
-  { id: 5, title: 'PUDGY PINS (PACK OF 6)', image: IPD5, price: '$39.99', URL: 'https://shop.pudgypenguins.com/products/pins-pack-of-6'},
-  { id: 6, title: 'Kanpai Pandas - Essential Tee - Storm', image: IPD6, price: '$50', URL: 'https://wearkc.com/collections/new-items/products/copy-of-essential-tee-2'},
-  { id: 7, title: 'Sappy Seals - Custom Hoodie - Black', image: IPD7, price: '$74.99', URL: 'https://shop.sappyseals.com/products/custom-hoodie-black'},
-  { id: 8, title: 'Chugs Embroidered Beanie', image: IPD8, price: '$25.00', URL: 'https://store.coolcats.com/products/chugs-embroidered-beanie'},
-  { id: 9, title: 'Blue Cat Plush', image: IPD9, price: '$35.00', URL: 'https://store.coolcats.com/products/blue-cat-plush'},
-  { id: 10, title: 'BASTARD GAN PUNK V2 #10104', image: IPD10, price: '0.202 ETH', URL: 'https://opensea.io/assets/ethereum/0x31385d3520bced94f77aae104b406994d8f2168c/10104'},
-]
+// const topSelling = [
+//   { id: 1, title: 'Deysi Vinyl', image: IPD1, price: '$185', URL: 'https://www.doodles.app/shop/product/deysi-vinyl'},
+//   { id: 2, title: 'Doodles x Crocs Jibbitz', image: IPD2, price: '$20', URL: 'https://www.doodles.app/shop/product/jibbitz-pack'},
+//   { id: 3, title: 'Adidas Originals x Doodles Tee', image: IPD3, price: '$55', URL: 'https://www.doodles.app/shop/product/doodles-x-adidas-tee'},
+//   { id: 4, title: 'Polar Bear Plushie', image: IPD4, price: '$29.99', URL: 'https://shop.pudgypenguins.com/products/polar-bear-plushie'},
+//   { id: 5, title: 'PUDGY PINS (PACK OF 6)', image: IPD5, price: '$39.99', URL: 'https://shop.pudgypenguins.com/products/pins-pack-of-6'},
+//   { id: 6, title: 'Kanpai Pandas - Essential Tee - Storm', image: IPD6, price: '$50', URL: 'https://wearkc.com/collections/new-items/products/copy-of-essential-tee-2'},
+//   { id: 7, title: 'Sappy Seals - Custom Hoodie - Black', image: IPD7, price: '$74.99', URL: 'https://shop.sappyseals.com/products/custom-hoodie-black'},
+//   { id: 8, title: 'Chugs Embroidered Beanie', image: IPD8, price: '$25.00', URL: 'https://store.coolcats.com/products/chugs-embroidered-beanie'},
+//   { id: 9, title: 'Blue Cat Plush', image: IPD9, price: '$35.00', URL: 'https://store.coolcats.com/products/blue-cat-plush'},
+//   { id: 10, title: 'BASTARD GAN PUNK V2 #10104', image: IPD10, price: '0.202 ETH', URL: 'https://opensea.io/assets/ethereum/0x31385d3520bced94f77aae104b406994d8f2168c/10104'},
+// ]
 
 export default function HomePage() {
   const carouselRef = useRef<HTMLDivElement>(null)

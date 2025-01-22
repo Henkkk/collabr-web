@@ -34,8 +34,13 @@ export default function LandingPage() {
               decentralized collaboration.
             </p>
             <div className="pt-4">
-              <ConnectWallet />
-            </div>
+                <a 
+                    href="/about"
+                    className="inline-block px-6 py-3 bg-[#008CFF] hover:bg-[#0070CC] text-white font-medium rounded-lg transition-colors duration-200"
+                >
+                    Learn More
+                </a>
+            </div> 
           </div>
 
           {/* Right side - Demo Videos */}

@@ -12,12 +12,14 @@ import { storeUserData } from '@/lib/firebase';
 
 function WalletConnectWrapper() {
   const { primaryWallet } = useDynamicContext();
+  const router = useRouter();
 
   useEffect(() => {
     const handleWalletConnection = async () => {
       if (primaryWallet?.address) {
         // Store user data when wallet is connected
         await storeUserData(primaryWallet.address);
+        router.push('/profile');
       } else {
         // Cleanup when wallet is disconnected
         Object.keys(localStorage).forEach(key => {
@@ -29,7 +31,7 @@ function WalletConnectWrapper() {
     };
 
     handleWalletConnection();
-  }, [primaryWallet]);
+  }, [primaryWallet, router]);
 
   return (
     <div>
