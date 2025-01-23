@@ -21,7 +21,8 @@ import Image from 'next/image'
 // import IPD8 from '@/media/IPD-008.jpeg'
 // import IPD9 from '@/media/IPD-009.jpeg'
 // import IPD10 from '@/media/IPD-010.jpeg'
-import LandingPage from '@/components/ui/landing'
+//import LandingPage from '@/components/ui/landing'
+import LandingPage from '@/components/ui/landing2'
 
 // const selectedIPA = [
 //   { id: 1, title: 'Rumors of Arctic Belonging - Blanket Toss, Nalukataq', image: IPA1, creator: 'Quantum-Art-Curator', price: '0.1168 ETH', URL: 'https://opensea.io/assets/ethereum/0x46ac8540d698167fcbb9e846511beb8cf8af9bd8/90073'},
