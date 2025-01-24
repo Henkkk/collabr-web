@@ -4,7 +4,7 @@ import { Input } from "./input"
 import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
 import { FaTwitter, FaDiscord, FaLinkedin } from "react-icons/fa"
-import { db } from "@/lib/firebase"
+import { db } from "../../lib/firebase"
 import { collection, addDoc, serverTimestamp } from "firebase/firestore"
 
 export default function ComingSoon() {

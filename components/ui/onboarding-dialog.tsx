@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useWalletClient } from "wagmi"
 import { ref, uploadString, getDownloadURL } from 'firebase/storage'
 import { updateDoc } from 'firebase/firestore'
-import { storage, storeUserData } from '@/lib/firebase'
+import { db, storage } from '@/lib/firebase'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { v4 as uuidv4 } from 'uuid'
 import { useRouter } from 'next/navigation'
+import { doc, setDoc } from 'firebase/firestore'
 
 interface OnboardingDialogProps {
   isOpen: boolean
@@ -48,18 +49,20 @@ export function OnboardingDialog({ isOpen, onClose }: OnboardingDialogProps) {
     setIsSubmitting(true)
 
     try {
-      // Get or create user document
-      const userRef = await storeUserData(wallet.account.address)
+      const uuid = crypto.randomUUID();
+      const userRef = doc(db, "Users", uuid);
       
-      if (!userRef) {
-        throw new Error('Failed to get or create user document')
-      }
-
       let updateData: any = {
+        id: uuid,
         creator_name: name,
         bio: bio,
         website: website,
         email: email,
+        earning: 0,
+        ip: [],
+        item: [],
+        wallet_address: wallet.account.address,
+        createdAt: new Date().toISOString(),
       }
 
       // Upload profile picture if provided
@@ -71,7 +74,7 @@ export function OnboardingDialog({ isOpen, onClose }: OnboardingDialogProps) {
         updateData.user_icon = imageUrl
       }
 
-      //await updateDoc(userRef, updateData)
+      await setDoc(userRef, updateData)
       onClose()
       router.push('/profile')
     } catch (error) {

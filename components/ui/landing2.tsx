@@ -6,6 +6,7 @@ import azuki_sample from '@/media/azuki_sample.png'
 import azuki_derivative from '@/media/IPD.png'
 import azuki_share from '@/media/share.png'
 import { useRouter } from 'next/navigation';
+import story_protocol from '@/media/story-favicon.png'
 
 export default function Landing2() {
     const router = useRouter();
@@ -44,6 +45,28 @@ export default function Landing2() {
                             Set Up Your Profile
                         </button>
                     </motion.div>
+                </motion.div>
+            </section>
+
+            {/* Story Protocol Banner */}
+            <section className="container mx-auto px-4 pb-8">
+                <motion.div
+                    className="text-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                >
+                    <div className="flex items-center justify-center gap-2">
+                        <Image
+                            src={story_protocol}
+                            alt="Story Protocol Logo"
+                            width={24}
+                            height={24}
+                        />
+                        <p className="text-gray-600 dark:text-gray-400 text-lg">
+                            Powered by Story Protocol
+                        </p>
+                    </div>
                 </motion.div>
             </section>
 
@@ -167,18 +190,26 @@ export default function Landing2() {
             {/* CTA Section */}
             <section className="container mx-auto px-4 py-20">
                 <motion.div 
-                    className="text-center"
+                    className="text-center space-x-4"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
                     <motion.a 
                         href="/learn"
-                        className="inline-block px-8 py-4 bg-gradient-to-r from-[#008CFF] to-[#0070CC] hover:from-[#0080E6] hover:to-[#0066B8] text-white font-semibold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl"
+                        className="inline-block w-48 px-8 py-4 bg-gradient-to-r from-[#008CFF] to-[#0070CC] hover:from-[#0080E6] hover:to-[#0066B8] text-white font-semibold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                     >
                         Watch our tutorial video
+                    </motion.a>
+                    <motion.a 
+                        href="https://cal.com/henry-yeung/15min"
+                        className="inline-block w-48 px-8 py-4 bg-white dark:bg-gray-800 text-[#008CFF] border-2 border-[#008CFF] font-semibold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        Book a Call With Us
                     </motion.a>
                 </motion.div>
             </section>

@@ -1,14 +1,12 @@
 "use client"
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  DynamicEmbeddedWidget,
-  useDynamicContext,
-  DynamicWidget
+  DynamicWidget,
+  useDynamicContext
 } from "@dynamic-labs/sdk-react-core";
-import { useWalletClient } from "wagmi";
-import Loading from "./loading";
-import { storeUserData } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 function WalletConnectWrapper() {
   const { primaryWallet } = useDynamicContext();
@@ -17,9 +15,18 @@ function WalletConnectWrapper() {
   useEffect(() => {
     const handleWalletConnection = async () => {
       if (primaryWallet?.address) {
-        // Store user data when wallet is connected
-        await storeUserData(primaryWallet.address);
-        router.push('/profile');
+        // Check if user exists
+        const usersRef = collection(db, "Users");
+        const q = query(usersRef, where("wallet_address", "==", primaryWallet.address));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          // Redirect new users to profile setup
+          router.push('/setup-profile');
+        } else {
+          // Existing user, redirect to profile
+          router.push('/profile');
+        }
       } else {
         // Cleanup when wallet is disconnected
         Object.keys(localStorage).forEach(key => {
@@ -40,7 +47,7 @@ function WalletConnectWrapper() {
   );
 }
 
-export default function Waller() {
+export default function Wallet() {
   return (
     <WalletConnectWrapper />
   );
