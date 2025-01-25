@@ -6,7 +6,7 @@ import logo from "@/media/Collabr_Logo.png"
 import Image from "next/image"
 
 export default function Navbar(){
-    const { primaryWallet } = useDynamicContext();
+    const { primaryWallet, user } = useDynamicContext();
 
     return (
     <nav className="bg-white text-black shadow-sm sticky top-0 z-50">
@@ -35,7 +35,7 @@ export default function Navbar(){
 
                 <div className="flex-shrink-0 flex items-center">
                     <ConnectWallet/>
-                    {primaryWallet && (
+                    {(primaryWallet || user) && (
                         <>
                             <Link href="/create/create-asset">
                                 <button className="ml-4 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-200 focus:ring-black">

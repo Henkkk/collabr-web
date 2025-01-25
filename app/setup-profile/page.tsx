@@ -15,7 +15,7 @@ import Image from "next/image"
 
 export default function SetupProfile() {
   const router = useRouter()
-  const { primaryWallet } = useDynamicContext()
+  const { primaryWallet, user } = useDynamicContext()
   const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
@@ -29,14 +29,19 @@ export default function SetupProfile() {
 
   useEffect(() => {
     const checkUser = async () => {
-      if (!primaryWallet?.address) {
+      const userEmail = user?.verifiedCredentials?.[0]?.email;
+      
+      if (!primaryWallet?.address && !userEmail) {
         router.push("/")
         return
       }
 
       // Check if user already exists
       const usersRef = collection(db, "Users")
-      const q = query(usersRef, where("wallet_address", "==", primaryWallet.address))
+      const q = primaryWallet?.address
+        ? query(usersRef, where("wallet_address", "==", primaryWallet.address))
+        : query(usersRef, where("email", "==", userEmail));
+        
       const querySnapshot = await getDocs(q)
 
       if (!querySnapshot.empty) {
@@ -46,7 +51,7 @@ export default function SetupProfile() {
     }
 
     checkUser()
-  }, [primaryWallet, router])
+  }, [primaryWallet, user, router])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -92,7 +97,8 @@ export default function SetupProfile() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!primaryWallet?.address || isSubmitting) return
+    const userEmail = user?.verifiedCredentials?.[0]?.email;
+    if (!primaryWallet?.address && !userEmail || isSubmitting) return
 
     try {
       setIsSubmitting(true)
@@ -109,10 +115,10 @@ export default function SetupProfile() {
         user_icon: profilePictureUrl,
         website: formData.website,
         earning: 0,
-        email: formData.email,
+        email: formData.email || userEmail, // Use Dynamic email if form email is empty
         ip: [],
         item: [],
-        wallet_address: primaryWallet.address,
+        wallet_address: primaryWallet?.address || null,
         createdAt: new Date().toISOString(),
       })
 

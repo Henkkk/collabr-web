@@ -107,7 +107,8 @@ export default function Landing2() {
                                     <div className="flex-1 space-y-4">
                                         <h3 className="text-xl font-semibold mb-3">Create an asset (For Example: Azuki #7854)</h3>
                                         <p className="text-gray-600 dark:text-gray-300">
-                                            Start by creating your asset, upload your works or use your existing NFTs and set up your license for your asset.
+                                        Create or upload your NFT, define its license—including who can remix, monetize, or create derivatives, 
+                                        and the associated costs—and let on-chain business logic automate and enforce these terms.
                                         </p>
                                     </div>
                                     <div className="w-40 h-40 relative">
@@ -138,7 +139,7 @@ export default function Landing2() {
                                     <div className="flex-1 space-y-4">
                                     <h3 className="text-xl font-semibold mb-3">Enable Remixing</h3>
                                         <p className="text-gray-600 dark:text-gray-300">
-                                            Let other create derivative works from your asset. Review and approve the derivative works on Colloration Hub
+                                            Let other create derivative works from your asset. Review and approve the derivative works.
                                         </p>
                                     </div>
                                     <div className="w-40 h-40 relative">

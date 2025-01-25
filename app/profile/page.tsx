@@ -1,6 +1,8 @@
 'use client'
+import React from 'react'
 import { useState, useEffect } from 'react'
 import { useWalletClient } from "wagmi";
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core"
 import Image from 'next/image'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
@@ -10,6 +12,7 @@ import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firesto
 import { EditProfileDialog } from '@/components/ui/edit-profile-dialog'
 import { useRouter } from 'next/navigation'
 import DefaultProfilePicture from '@/media/Default-Profile-Picture.png'
+import { useAuth } from '@/lib/auth'
 
 interface UserProfile {
   user_name: string
@@ -40,18 +43,22 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const { data: wallet } = useWalletClient();
+  const { primaryWallet, user: dynamicUser } = useDynamicContext();
   const router = useRouter()
   const [storeItems, setStoreItems] = useState<StoreItem[]>([])
 
   const fetchUserProfile = async () => {
-    if (!wallet?.account?.address) {
+    if (!primaryWallet?.address && !dynamicUser?.email) {
       setLoading(false);
       return;
     }
 
     try {
       const usersRef = collection(db, "Users");
-      const q = query(usersRef, where("wallet_address", "==", wallet.account.address));
+      const q = primaryWallet?.address 
+        ? query(usersRef, where("wallet_address", "==", primaryWallet.address))
+        : query(usersRef, where("email", "==", dynamicUser?.email));
+      
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
@@ -120,12 +127,12 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
-    if (wallet?.account?.address) {
+    if (primaryWallet?.address || dynamicUser?.email) {
       fetchUserProfile();
     } else {
       setLoading(false);
     }
-  }, [wallet?.account?.address]);
+  }, [primaryWallet?.address, dynamicUser?.email]);
 
   const handleEditProfile = () => {
     setIsEditDialogOpen(true)
@@ -135,12 +142,12 @@ export default function ProfilePage() {
     router.push(`/asset/${assetId}`)
   }
 
-  if (!wallet?.account?.address) {
+  if (!primaryWallet?.address && !dynamicUser?.email) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Connect Your Wallet</h1>
-          <p>Please connect your wallet to view your profile.</p>
+          <h1 className="text-2xl font-bold mb-4">Connect to View Profile</h1>
+          <p>Please connect your wallet or sign in with email to view your profile.</p>
         </div>
       </div>
     )

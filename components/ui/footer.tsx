@@ -74,7 +74,7 @@ const Footer = () => {
                 <FaLinkedin className="h-6 w-6" />
               </a>
               <a 
-                href="https://discord.gg/gf2Q8BZQC" 
+                href="https://discord.gg/gf2Q8BZQC8" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-gray-600 hover:text-indigo-600 transition-colors"

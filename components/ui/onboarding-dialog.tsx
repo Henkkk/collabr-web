@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import { v4 as uuidv4 } from 'uuid'
 import { useRouter } from 'next/navigation'
 import { doc, setDoc } from 'firebase/firestore'
+import { useAuth } from '@/lib/auth'
 
 interface OnboardingDialogProps {
   isOpen: boolean
@@ -25,8 +26,10 @@ export function OnboardingDialog({ isOpen, onClose }: OnboardingDialogProps) {
   const [image, setImage] = useState<string>('')
   const [website, setWebsite] = useState('')
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { data: wallet } = useWalletClient()
+  const { signUp, user: authUser } = useAuth()
   const router = useRouter()
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,14 +44,19 @@ export function OnboardingDialog({ isOpen, onClose }: OnboardingDialogProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!wallet?.account?.address) {
-      alert('No wallet connected')
+    if (!wallet?.account?.address && !email) {
+      alert('Please connect a wallet or provide an email')
       return
     }
 
     setIsSubmitting(true)
 
     try {
+      // If using email authentication, sign up first
+      if (!wallet?.account?.address && email && password) {
+        await signUp(email, password)
+      }
+
       const uuid = crypto.randomUUID();
       const userRef = doc(db, "Users", uuid);
       
@@ -61,7 +69,7 @@ export function OnboardingDialog({ isOpen, onClose }: OnboardingDialogProps) {
         earning: 0,
         ip: [],
         item: [],
-        wallet_address: wallet.account.address,
+        wallet_address: wallet?.account?.address || null,
         createdAt: new Date().toISOString(),
       }
 
@@ -145,16 +153,32 @@ export function OnboardingDialog({ isOpen, onClose }: OnboardingDialogProps) {
             />
           </div>
 
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-            />
-          </div>
+          {!wallet?.account?.address && (
+            <>
+              <div>
+                <Label htmlFor="email">Email*</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="password">Password*</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+            </>
+          )}
 
           <DialogFooter>
             <Button type="submit" disabled={isSubmitting}>
