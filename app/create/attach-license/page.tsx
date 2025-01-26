@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWalletClient } from 'wagmi';
 import { zeroAddress } from 'viem'
@@ -9,20 +9,21 @@ import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { licenseTemplates } from '@/lib/constants/licenseTemplates';
 import { v4 as uuidv4 } from 'uuid';
 import { Notification } from '@/components/ui/notification';
-import { client } from '@/lib/story-protocol/utils/utils'
-import { uploadJSONToIPFS } from '@/lib/story-protocol/utils/uploadToIpfs'
-import { createHash } from 'crypto'
-import { IpMetadata } from '@story-protocol/core-sdk'
-
-interface AssetAttribute {
-    key: string;
-    value: string;
-}
-
+import { Info } from 'lucide-react';
 const convertDateToTimestamp = (dateString: string) => {
     return dateString ? new Date(dateString).getTime() : 0;
 };
-
+const SUPPORTED_CURRENCIES = [
+  'BTC',
+  'ETH',
+  'USDT',
+  'BNB',
+  'XRP',
+  'ADA',
+  'SOL',
+  'DOT',
+] as const;
+export type SupportedCurrency = typeof SUPPORTED_CURRENCIES[number];
 const initDB = async () => {
   return new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open('assetStore', 1);
@@ -38,7 +39,6 @@ const initDB = async () => {
     };
   });
 };
-
 export default function AttachLicensePage() {
     const router = useRouter();
     const { data: wallet } = useWalletClient();
@@ -75,70 +75,13 @@ export default function AttachLicensePage() {
                 throw new Error('Missing required asset data');
             }
 
+            //console.log("this is the assetImage", assetImage);
+
             // Upload image to Firebase Storage first
             const imageId = uuidv4();
             const imageRef = ref(storage, `ip_assets/${imageId}`);
             await uploadString(imageRef, assetImage, 'data_url');
             const imageURL = await getDownloadURL(imageRef);
-
-            // 1. Set up Story Protocol IP Metadata
-            const ipMetadata: IpMetadata = client.ipAsset.generateIpMetadata({
-                title: assetName || '',
-                description: assetDescription || '',
-                attributes: assetAttributes.map((attr: AssetAttribute) => ({
-                    key: attr.key,
-                    value: attr.value,
-                })),
-                tags: assetTags,
-            });
-
-            // 2. Set up NFT Metadata
-            const nftMetadata = {
-                name: assetName,
-                description: assetDescription,
-                image: imageURL,
-                attributes: assetAttributes,
-                tags: assetTags,
-            };
-
-            // 3. Upload metadata to IPFS
-            const ipIpfsHash = await uploadJSONToIPFS(ipMetadata);
-            const ipHash = createHash('sha256').update(JSON.stringify(ipMetadata)).digest('hex');
-            const nftIpfsHash = await uploadJSONToIPFS(nftMetadata);
-            const nftHash = createHash('sha256').update(JSON.stringify(nftMetadata)).digest('hex');
-
-            // 4. Register the NFT as an IP Asset with Story Protocol
-            console.log('pilTerms', pilTerms)
-            
-            const spResponse = await client.ipAsset.mintAndRegisterIpAssetWithPilTerms({
-                spgNftContract: process.env.NEXT_PUBLIC_SPG_NFT_CONTRACT_ADDRESS as `0x${string}`,
-                terms: [{
-                    transferable: formData.transferable === 'true',
-                    royaltyPolicy: selectedTemplate === '1' ? zeroAddress : "0x7D2d9af4E4ab14Afcfd86436BC348928B40963Dd",
-                    defaultMintingFee: Number(formData.defaultMintingFee) || 0,
-                    expiration: BigInt(convertDateToTimestamp(formData.expiration)),
-                    commercialUse: pilTerms.commercialUse,
-                    commercialAttribution: pilTerms.commercialAttribution,
-                    commercializerChecker: zeroAddress,
-                    commercializerCheckerData: zeroAddress,
-                    commercialRevShare: Number(formData.commercialRevShare) || 0,
-                    commercialRevCeiling: Number(formData.commercialRevCeiling) || 0,
-                    derivativesAllowed: pilTerms.derivativesAllowed,
-                    derivativesAttribution: pilTerms.derivativesAttribution,
-                    derivativesApproval: pilTerms.derivativesApproval,
-                    derivativesReciprocal: formData.derivativesReciprocal === 'true',
-                    derivativeRevCeiling: "",
-                    currency: "0xC0F6E387aC0B324Ec18EAcf22EE7271207dCE3d5",
-                    uri: formData.uri || '',
-                }],
-                ipMetadata: {
-                    ipMetadataURI: `https://ipfs.io/ipfs/${ipIpfsHash}`,
-                    ipMetadataHash: `0x${ipHash}`,
-                    nftMetadataURI: `https://ipfs.io/ipfs/${nftIpfsHash}`,
-                    nftMetadataHash: `0x${nftHash}`,
-                },
-                txOptions: { waitForTransaction: true },
-            });
 
             const sanitizedPilTerms = {
                 ...pilTerms,
@@ -147,7 +90,6 @@ export default function AttachLicensePage() {
                 commercialRevShare: Number(pilTerms.commercialRevShare),
                 defaultMintingFee: Number(pilTerms.defaultMintingFee),
             };
-
             // Create new IPA document with sanitized data and image URL
             const ipaData = {
                 title: assetName,
@@ -162,11 +104,9 @@ export default function AttachLicensePage() {
                 remix: 0,
                 royalty: 0,
                 expiration: convertDateToTimestamp(formData.expiration),
-                ipId: spResponse.ipId, // Store Story Protocol IP ID
-                txHash: spResponse.txHash, // Store transaction hash
             };
-
             const ipaRef = await addDoc(collection(db, 'IPA'), ipaData);
+            //console.log("New IPA created with ID:", ipaRef.id);
             
             // Update user's IP array - find user by wallet address
             const usersSnapshot = await getDocs(query(
@@ -181,7 +121,6 @@ export default function AttachLicensePage() {
             } else {
                 console.error('User document not found for wallet address:', wallet.account.address);
             }
-
             // Clear IndexedDB after successful submission
             const clearTransaction = IndexedDB.transaction('assets', 'readwrite');
             const clearStore = clearTransaction.objectStore('assets');
@@ -206,16 +145,6 @@ export default function AttachLicensePage() {
         template: typeof licenseTemplates[0], 
         onBack: () => void 
     }) => {
-        // Add useEffect to set default royalty policy when commercial use is enabled
-        useEffect(() => {
-            if ((template.id === '2' || template.id === '3') && !formData.royaltyPolicy) {
-                setFormData(prev => ({
-                    ...prev,
-                    royaltyPolicy: "0x7D2d9af4E4ab14Afcfd86436BC348928B40963Dd"
-                }));
-            }
-        }, [template.id]); // Only run when template.id changes
-
         return (
             <div>
                 <h2 className="text-xl font-semibold mb-4">{template.name}</h2>
@@ -229,36 +158,30 @@ export default function AttachLicensePage() {
                             commercialUse: false,
                             commercialAttribution: false,
                             derivativeRevCeiling: BigInt(0),
-                            royaltyPolicy: "",
                         } : {}),
                         
                         ...((template.id === '2') ? {
-                            derivativesAllowed: formData.derivativesAllowed === 'true',
-                            derivativesAttribution: formData.derivativesAttribution === 'true',
-                            derivativesApproval: formData.derivativesApproval === 'true',
                             commercialUse: true,
                             commercialAttribution: true,
-                            royaltyPolicy: "0x7D2d9af4E4ab14Afcfd86436BC348928B40963Dd",
                         } : {}),
                         ...((template.id === '3') ? {
                             derivativesAllowed: true,
                             derivativesAttribution: true,
                             commercialUse: true,
                             commercialAttribution: true,
-                            royaltyPolicy: "0x7D2d9af4E4ab14Afcfd86436BC348928B40963Dd",
                         } : {}),
                         transferable: formData.transferable === 'true',
-                        royaltyPolicy: template.id === '1' ? "" : "0x7D2d9af4E4ab14Afcfd86436BC348928B40963Dd",
+                        royaltyPolicy: formData.royaltyPolicy || "",
                         defaultMintingFee: parseFloat(formData.defaultMintingFee || '0'),
                         expiration: convertDateToTimestamp(formData.expiration),
-                        commercializerChecker: formData.commercializerChecker || zeroAddress,
-                        commercializerCheckerData: formData.commercializerCheckerData || zeroAddress,
+                        commercializerChecker: "",
+                        commercializerCheckerData: "",
                         commercialRevShare: parseInt(formData.commercialRevShare || '50'),
                         commercialRevCeiling: "",
                         derivativesApproval: false,
                         derivativesReciprocal: formData.derivativesReciprocal === 'true',
                         derivativeRevCeiling: "",
-                        currency: "0xC0F6E387aC0B324Ec18EAcf22EE7271207dCE3d5",
+                        currency: formData.currency || zeroAddress,
                         uri: formData.uri || "",
                     };
                     handleSubmit(e, pilTerms);
@@ -415,19 +338,15 @@ export default function AttachLicensePage() {
                             </div>
                         </>
                     )}
-                    {template.parameters.map((param) => (
-                        <div key={param}>
+                    {template.parameters.map((param, index) => (
+                        <div key={index}>
                             <label className="block text-sm font-medium mb-1">
                                 {param.split(/(?=[A-Z])/).join(' ')}
                             </label>
-                            {param === 'currency' ? (
-                                <input
-                                    type="text"
-                                    className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
-                                    value="sUSD (0xC0F6E387aC0B324Ec18EAcf22EE7271207dCE3d5)"
-                                    disabled
-                                />
-                            ) : param === 'defaultMintingFee' || param === 'commercialRevCeiling' ? (
+                            <label className="block text-xs text-gray-500 mb-1">
+                                {template.infos[index]}
+                            </label>
+                            {param === 'Licensing Fee' ? (
                                 <input
                                     type="number"
                                     min="0"
@@ -438,33 +357,7 @@ export default function AttachLicensePage() {
                                         [param]: e.target.value
                                     })}
                                 />
-                            ) : ['royaltyPolicy', 'commercializerChecker', 'commercializerCheckerData'].includes(param) ? (
-                                <>
-                                    <input
-                                        type="text"
-                                        placeholder=""
-                                        className="w-full p-2 border rounded"
-                                        value={formData[param] || ''}
-                                        onChange={(e) => setFormData({
-                                            ...formData,
-                                            [param]: e.target.value
-                                        })}
-                                    />
-                                    {param === 'royaltyPolicy' && (
-                                        <div className="mt-4">
-                                            <label className="block text-sm font-medium mb-1">
-                                                Currency
-                                            </label>
-                                            <input
-                                                type="text"
-                                                className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
-                                                value="sUSD (0xC0F6E387aC0B324Ec18EAcf22EE7271207dCE3d5)"
-                                                disabled
-                                            />
-                                        </div>
-                                    )}
-                                </>
-                            ) : param === 'commercialRevShare' ? (
+                            ) : param === 'Revenue Sharing Percentage' ? (
                                 <input
                                     type="number"
                                     min="0"
@@ -476,17 +369,7 @@ export default function AttachLicensePage() {
                                         [param]: e.target.value
                                     })}
                                 />
-                            ) : param === 'uri' ? (
-                                <input
-                                    type="text"
-                                    className="w-full p-2 border rounded"
-                                    value={formData[param] || ''}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        [param]: e.target.value
-                                    })}
-                                />
-                            ) : param === 'expiration' ? (
+                            ) : param === 'Expiration date' ? (
                                 <input
                                     type="date"
                                     className="w-full p-2 border rounded"
@@ -527,7 +410,7 @@ export default function AttachLicensePage() {
                             className="bg-black text-white px-4 py-2 rounded"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? 'Creating...' : 'Create PIL License'}
+                            {isSubmitting ? 'Creating...' : 'Create License'}
                         </button>
                     </div>
                 </form>
@@ -582,13 +465,6 @@ export default function AttachLicensePage() {
                             </div>
                         ))}
                     </div>
-                    <button
-                        onClick={() => router.push('/create/custom-license')}
-                        className="w-full mt-6 p-4 border-2 border-dashed border-blue-500 rounded-lg text-blue-500 hover:bg-blue-50 flex items-center justify-center"
-                    >
-                        <span className="text-xl mr-2">+</span>
-                        Create Custom License from Scratch
-                    </button>
                 </>
             ) : (
                 <LicenseConfiguration 
