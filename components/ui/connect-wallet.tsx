@@ -17,27 +17,16 @@ function WalletConnectWrapper() {
       console.log('Dynamic user:', user);
       console.log('Primary wallet:', primaryWallet);
       
-      const userEmail = user?.verifiedCredentials?.[0]?.email;
-      console.log('User email:', userEmail);
-
-      if (primaryWallet?.address || userEmail) {
-        // Check if user exists
-        const usersRef = collection(db, "Users");
-        const q = primaryWallet?.address
-          ? query(usersRef, where("wallet_address", "==", primaryWallet.address))
-          : query(usersRef, where("email", "==", userEmail));
-          
-        console.log('Querying with:', primaryWallet?.address || userEmail);
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.empty) {
-          console.log('No user found, redirecting to setup');
+      // Only redirect if the user state has actually changed
+      if (user && window.location.pathname === '/') {
+        if (user.newUser) {
+          console.log('New user, redirecting to setup');
           router.push('/setup-profile');
         } else {
-          console.log('User found, redirecting to profile');
+          console.log('Existing user, redirecting to profile');
           router.push('/profile');
         }
-      } else {
+      } else if (!user) {
         // Cleanup when disconnected
         Object.keys(localStorage).forEach(key => {
           if (key.toLowerCase().includes('walletconnect')) {
