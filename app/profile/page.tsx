@@ -56,12 +56,12 @@ export default function ProfilePage() {
     try {
       const usersRef = collection(db, "Users");
 
-      console.log("primaryWallet", primaryWallet);
-      console.log("dynamicUser", dynamicUser);
+      // console.log("primaryWallet", primaryWallet);
+      // console.log("dynamicUser", dynamicUser);
 
-      const q = primaryWallet?.address 
-        ? query(usersRef, where("wallet_address", "==", primaryWallet.address))
-        : query(usersRef, where("email", "==", dynamicUser?.email));
+      const q = dynamicUser?.email
+        ? query(usersRef, where("email", "==", dynamicUser.email))
+        : query(usersRef, where("wallet_address", "==", primaryWallet?.address));
       
       const querySnapshot = await getDocs(q);
 
@@ -69,7 +69,7 @@ export default function ProfilePage() {
         const userDoc = querySnapshot.docs[0];
         const userData = userDoc.data();
 
-        console.log("userData", userData);
+        //console.log("userData", userData);
         
         setUser({
           user_name: userData.creator_name || '',

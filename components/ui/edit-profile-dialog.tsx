@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useWalletClient } from "wagmi"
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core"
 import { ref, uploadString, getDownloadURL } from 'firebase/storage'
 import { collection, query, where, getDocs, updateDoc } from 'firebase/firestore'
 import { db, storage } from '@/lib/firebase'
@@ -30,6 +31,7 @@ export function EditProfileDialog({ isOpen, onClose, currentProfile, onProfileUp
   const [image, setImage] = useState<string>(currentProfile.user_icon || '')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { data: wallet } = useWalletClient()
+  const { primaryWallet, user: dynamicUser } = useDynamicContext()
   const [website, setWebsite] = useState(currentProfile.website || '')
   const [email, setEmail] = useState(currentProfile.email || '')
 
@@ -45,8 +47,8 @@ export function EditProfileDialog({ isOpen, onClose, currentProfile, onProfileUp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!wallet?.account?.address) {
-      alert('No wallet connected')
+    if (!wallet?.account?.address && !dynamicUser?.email) {
+      alert('No wallet connected or email user found')
       return
     }
 
@@ -54,7 +56,9 @@ export function EditProfileDialog({ isOpen, onClose, currentProfile, onProfileUp
 
     try {
       const usersRef = collection(db, "Users")
-      const q = query(usersRef, where("wallet_address", "==", wallet.account.address))
+      const q = wallet?.account?.address 
+        ? query(usersRef, where("wallet_address", "==", wallet.account.address))
+        : query(usersRef, where("email", "==", dynamicUser?.email));
       const querySnapshot = await getDocs(q)
 
       if (!querySnapshot.empty) {
