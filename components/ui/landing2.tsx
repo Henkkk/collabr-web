@@ -139,7 +139,9 @@ export default function Landing2() {
                                     <div className="flex-1 space-y-4">
                                     <h3 className="text-xl font-semibold mb-3">Enable Remixing</h3>
                                         <p className="text-gray-600 dark:text-gray-300">
-                                            Let other create derivative works from your asset. Review and approve the derivative works.
+                                            If your works are open for remixing, you will receive remixing requests from other creators. You can view these requests in the "Collaboration Hub" tab. Review the requests and approve them as needed,
+                                            and after your approval, the derivative works will be created and minted on-chain.
+                                            
                                         </p>
                                     </div>
                                     <div className="w-40 h-40 relative">

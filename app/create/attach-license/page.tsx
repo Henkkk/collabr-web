@@ -9,20 +9,23 @@ import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { licenseTemplates } from '@/lib/constants/licenseTemplates';
 import { v4 as uuidv4 } from 'uuid';
 import { Notification } from '@/components/ui/notification';
+import { client } from '@/lib/story-protocol/utils/utils'
+import { uploadJSONToIPFS } from '@/lib/story-protocol/utils/uploadToIpfs'
+import { createHash } from 'crypto'
+import { IpMetadata } from '@story-protocol/core-sdk'
+
+interface AssetAttribute {
+    key: string;
+    value: string;
+}
+
 const convertDateToTimestamp = (dateString: string) => {
     return dateString ? new Date(dateString).getTime() : 0;
 };
-const SUPPORTED_CURRENCIES = [
-  'BTC',
-  'ETH',
-  'USDT',
-  'BNB',
-  'XRP',
-  'ADA',
-  'SOL',
-  'DOT',
-] as const;
+const SUPPORTED_CURRENCIES = ['sUSD'] as const;
+
 export type SupportedCurrency = typeof SUPPORTED_CURRENCIES[number];
+
 const initDB = async () => {
   return new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open('assetStore', 1);
@@ -38,6 +41,7 @@ const initDB = async () => {
     };
   });
 };
+
 export default function AttachLicensePage() {
     const router = useRouter();
     const { data: wallet } = useWalletClient();
@@ -74,13 +78,50 @@ export default function AttachLicensePage() {
                 throw new Error('Missing required asset data');
             }
 
-            //console.log("this is the assetImage", assetImage);
-
             // Upload image to Firebase Storage first
             const imageId = uuidv4();
             const imageRef = ref(storage, `ip_assets/${imageId}`);
             await uploadString(imageRef, assetImage, 'data_url');
             const imageURL = await getDownloadURL(imageRef);
+
+            // 1. Set up Story Protocol IP Metadata
+            const ipMetadata: IpMetadata = client.ipAsset.generateIpMetadata({
+                title: assetName || '',
+                description: assetDescription || '',
+                attributes: assetAttributes.map((attr: AssetAttribute) => ({
+                    key: attr.key,
+                    value: attr.value,
+                })),
+                tags: assetTags,
+            });
+
+            // 2. Set up NFT Metadata
+            const nftMetadata = {
+                name: assetName,
+                description: assetDescription,
+                image: imageURL,
+                attributes: assetAttributes,
+                tags: assetTags,
+            };
+
+            // 3. Upload metadata to IPFS
+            const ipIpfsHash = await uploadJSONToIPFS(ipMetadata);
+            const ipHash = createHash('sha256').update(JSON.stringify(ipMetadata)).digest('hex');
+            const nftIpfsHash = await uploadJSONToIPFS(nftMetadata);
+            const nftHash = createHash('sha256').update(JSON.stringify(nftMetadata)).digest('hex');
+
+            // 4. Register the NFT as an IP Asset with Story Protocol
+            const spResponse = await client.ipAsset.mintAndRegisterIpAssetWithPilTerms({
+                spgNftContract: process.env.NEXT_PUBLIC_SPG_NFT_CONTRACT_ADDRESS as `0x${string}`,
+                terms: pilTerms,
+                ipMetadata: {
+                    ipMetadataURI: `https://ipfs.io/ipfs/${ipIpfsHash}`,
+                    ipMetadataHash: `0x${ipHash}`,
+                    nftMetadataURI: `https://ipfs.io/ipfs/${nftIpfsHash}`,
+                    nftMetadataHash: `0x${nftHash}`,
+                },
+                txOptions: { waitForTransaction: true },
+            });
 
             const sanitizedPilTerms = {
                 ...pilTerms,
@@ -89,6 +130,7 @@ export default function AttachLicensePage() {
                 commercialRevShare: Number(pilTerms.commercialRevShare),
                 defaultMintingFee: Number(pilTerms.defaultMintingFee),
             };
+
             // Create new IPA document with sanitized data and image URL
             const ipaData = {
                 title: assetName,
@@ -103,9 +145,11 @@ export default function AttachLicensePage() {
                 remix: 0,
                 royalty: 0,
                 expiration: convertDateToTimestamp(formData.expiration),
+                ipId: spResponse.ipId, // Store Story Protocol IP ID
+                txHash: spResponse.txHash, // Store transaction hash
             };
+
             const ipaRef = await addDoc(collection(db, 'IPA'), ipaData);
-            //console.log("New IPA created with ID:", ipaRef.id);
             
             // Update user's IP array - find user by wallet address
             const usersSnapshot = await getDocs(query(
@@ -120,6 +164,7 @@ export default function AttachLicensePage() {
             } else {
                 console.error('User document not found for wallet address:', wallet.account.address);
             }
+
             // Clear IndexedDB after successful submission
             const clearTransaction = IndexedDB.transaction('assets', 'readwrite');
             const clearStore = clearTransaction.objectStore('assets');

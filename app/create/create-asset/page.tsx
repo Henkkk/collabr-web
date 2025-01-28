@@ -282,13 +282,17 @@ export default function CreateAssetPage() {
               <CardTitle>Preview</CardTitle>
             </CardHeader>
             <CardContent>
-              {image && (
+              {image ? (
                 <div className="aspect-square w-full relative mb-4">
                   <img src={image} alt="Preview" className="object-cover rounded-lg" />
                 </div>
+              ) : (
+                <div className="aspect-square w-full relative mb-4 bg-secondary rounded-lg flex items-center justify-center">
+                  <span className="text-muted-foreground">Preview</span>
+                </div>
               )}
-              <h2 className="text-xl font-bold mb-2">{name || 'Untitled'}</h2>
-              <p className="text-sm text-gray-500 mb-4">{description || '###'}</p>
+              <h2 className="text-xl font-bold mb-2">{name || ''}</h2>
+              <p className="text-sm text-gray-500 mb-4">{description || ''}</p>
               {attributes.length > 0 && attributes[0].key && (
                 <div className="mb-4">
                   <h3 className="text-lg font-semibold mb-2">Attributes</h3>

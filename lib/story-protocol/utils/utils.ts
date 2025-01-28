@@ -6,10 +6,10 @@ dotenv.config()
 
 // Add your rpc provider url to your .env file
 // You can select from one of these: https://docs.story.foundation/docs/story-network#-rpcs
-export const RPCProviderUrl = process.env.RPC_PROVIDER_URL || 'https://rpc.odyssey.storyrpc.io'
+export const RPCProviderUrl = process.env.NEXT_PUBLIC_RPC_PROVIDER_URL || 'https://rpc.odyssey.storyrpc.io'
 
 // Add your private key to your .env file.
-const privateKey: Address = `0x${process.env.WALLET_PRIVATE_KEY}`
+const privateKey: Address = `0x${process.env.NEXT_PUBLIC_WALLET_PRIVATE_KEY}`
 export const account: Account = privateKeyToAccount(privateKey)
 const config: StoryConfig = {
     account: account,
@@ -22,8 +22,8 @@ export const client = StoryClient.newClient(config)
 export const NonCommercialSocialRemixingTermsId = '1'
 
 // A NFT contract address that will be used to represent your IP Assets
-export const NFTContractAddress: Address = (process.env.NFT_CONTRACT_ADDRESS as Address) || '0x041B4F29183317Fd352AE57e331154b73F8a1D73'
-export const SPGNFTContractAddress: Address = process.env.SPG_NFT_CONTRACT_ADDRESS as Address
+export const NFTContractAddress: Address = (process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS as Address) || '0x041B4F29183317Fd352AE57e331154b73F8a1D73'
+export const SPGNFTContractAddress: Address = process.env.NEXT_PUBLIC_SPG_NFT_CONTRACT_ADDRESS as Address
 
 // The currency used for paying License Tokens or tipping
 // This address must be whitelisted by the protocol. You can see the
