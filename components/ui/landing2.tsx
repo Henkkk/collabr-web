@@ -7,6 +7,7 @@ import azuki_derivative from '@/media/IPD.png'
 import azuki_share from '@/media/share.png'
 import { useRouter } from 'next/navigation';
 import story_protocol from '@/media/story-favicon.png'
+import { track } from '@vercel/analytics';
 
 export default function Landing2() {
     const router = useRouter();
@@ -200,6 +201,7 @@ export default function Landing2() {
                 >
                     <motion.a 
                         href="/learn"
+                        onClick={() => track('tutorial_video_click')}
                         className="inline-block w-48 px-8 py-4 bg-gradient-to-r from-[#008CFF] to-[#0070CC] hover:from-[#0080E6] hover:to-[#0066B8] text-white font-semibold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -208,6 +210,7 @@ export default function Landing2() {
                     </motion.a>
                     <motion.a 
                         href="https://cal.com/henry-yeung/15min"
+                        onClick={() => track('book_call_click')}
                         className="inline-block w-48 px-8 py-4 bg-white dark:bg-gray-800 text-[#008CFF] border-2 border-[#008CFF] font-semibold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
