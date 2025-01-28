@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 
 const Survey = () => {
   const [currentPage, setCurrentPage] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  
 
   const questions = [
     {
@@ -24,6 +26,14 @@ const Survey = () => {
       inputType: "date"
     },
   ];
+  const handleInputChange = (value: string, questionIndex: number) => {
+    setAnswers((prev) => ({ ...prev, [questionIndex]: value }));
+  };
+
+  const isNextDisabled =
+  !answers[currentPage] || // No value provided for the current question
+  (questions[currentPage].inputType === "number" && answers[currentPage] === "") || // Empty number input
+  (questions[currentPage].inputType === "range" && answers[currentPage] === null); // No slider value set
 
   const handleNext = () => {
     if (currentPage < questions.length - 1) {
@@ -51,9 +61,9 @@ const Survey = () => {
   <div>
     <h2>{questions[currentPage].question}</h2>
 
-    <div>
+    <div style={{ display: "flex", justifyContent: "center", gap: "30px" }}>
       {questions[currentPage].options?.map((option, index) => (
-        <div key={index} style={{ margin: "10px 0" }}>
+        <div key={index} style={{ margin: "30px 0" }}>
           <label
             style={{
               display: "block",
@@ -83,6 +93,7 @@ const Survey = () => {
                 display: "none", // Hide the default radio button
               }}
               onChange={(e) => {
+                handleInputChange(option, currentPage)
                 const inputs = document.getElementsByName(
                   `question-${currentPage}`
                 ) as NodeListOf<HTMLInputElement>;
@@ -115,8 +126,9 @@ const Survey = () => {
       <input
         type="number"
         placeholder="Enter a licensing fee"
+        onChange={(e) => handleInputChange(e.target.value, currentPage)}
         style={{
-          margin: "10px auto",
+          margin: "30px auto",
           padding: "5px",
           width: "100%",
           maxWidth: "400px", // Limit the width of the input
@@ -125,16 +137,27 @@ const Survey = () => {
     )}
 
     {questions[currentPage].inputType === "range" && (
-      <input
-        type="range"
-        min={questions[currentPage].range?.min}
-        max={questions[currentPage].range?.max}
-        style={{
-          margin: "10px auto",
-          width: "100%",
-          maxWidth: "400px", // Limit the width of the input
-        }}
-      />
+        <div style={{ textAlign: "center" }}>
+        <input
+            type="range"
+            min={questions[currentPage].range?.min}
+            max={questions[currentPage].range?.max}
+            value={answers[currentPage] || "0"} // Use initial value or default to 0
+            onChange={(e) => {
+                handleInputChange(e.target.value, currentPage)
+                const value = e.target.value;
+                setAnswers((prev) => ({ ...prev, [currentPage]: value }));
+            }}
+            style={{
+            margin: "30px auto",
+            width: "100%",
+            maxWidth: "400px", // Limit the width of the input
+            }}
+        />
+        <div style={{ marginTop: "2px", marginBottom: "40px", fontSize: "24px", fontWeight: "bold" }}>
+            {answers[currentPage] || 0}%
+        </div>
+        </div>
     )}
 
     {questions[currentPage].inputType === "date" && (
@@ -142,7 +165,7 @@ const Survey = () => {
         type="date"
         className="w-full p-2 border rounded"
         style={{
-          margin: "10px auto",
+          margin: "30px auto",
           width: "100%",
           maxWidth: "400px", // Limit the width of the input
         }}
@@ -167,19 +190,22 @@ const Survey = () => {
       Back
     </button>
     {currentPage < questions.length - 1 ? (
-      <button
+        <button
         onClick={handleNext}
+        disabled={
+        isNextDisabled
+        }
         style={{
-          backgroundColor: "#007bff",
-          color: "white",
-          cursor: "pointer",
-          border: "none",
-          padding: "10px 20px",
-          borderRadius: "5px",
+        backgroundColor: isNextDisabled ? "#cccccc" : "#007bff",
+        color: isNextDisabled ? "#666666" : "white",
+        cursor: isNextDisabled ? "not-allowed" : "pointer",
+        border: "none",
+        padding: "10px 20px",
+        borderRadius: "5px",
         }}
-      >
+    >
         Next
-      </button>
+        </button>
     ) : (
       <button
         onClick={() => {
