@@ -233,7 +233,7 @@ const Survey = () => {
     ) : (
       <button
         onClick={() => {
-          window.location.href = "/profile"; // Redirect to the "Thank You" page
+          window.location.href = "/review-license"; // Redirect to the "Thank You" page
         }}
         style={{
           backgroundColor: "#28a745",
