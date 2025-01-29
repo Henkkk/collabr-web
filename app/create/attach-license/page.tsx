@@ -13,7 +13,7 @@ const Survey = () => {
     },
     {
       question: "What should the licensing fee be to remix the work?",
-      inputType: "number", // User enters text
+      inputType: "dollars", // User enters text
     },
     {
       question:
@@ -53,6 +53,7 @@ const Survey = () => {
   style={{
     fontSize: "2.5rem", // Increase font size
     fontWeight: "bold", // Ensure the font is bold
+    marginTop: "20px",
     marginBottom: "20px", // Add some spacing below the heading
   }}
 >
@@ -122,18 +123,41 @@ const Survey = () => {
       ))}
     </div>
 
-    {questions[currentPage].inputType === "number" && (
-      <input
-        type="number"
-        placeholder="Enter a licensing fee"
-        onChange={(e) => handleInputChange(e.target.value, currentPage)}
-        style={{
-          margin: "30px auto",
-          padding: "5px",
-          width: "100%",
-          maxWidth: "400px", // Limit the width of the input
-        }}
-      />
+    {questions[currentPage].inputType === "dollars" && (
+        <div style={{ position: "relative", maxWidth: "400px", margin: "0 auto" }}>
+        <span
+            style={{
+            position: "absolute",
+            left: "10px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            fontSize: "16px",
+            fontWeight: "bold",
+            color: "#333",
+            }}
+        >
+            $
+        </span>
+        <input
+            type="text"
+            placeholder="Enter a licensing fee"
+            value={answers[currentPage] ? `${answers[currentPage]}` : ""}
+            onChange={(e) => {
+            let value = e.target.value.replace(/[^0-9.]/g, ""); // Allow only numbers & decimal
+            if (value.startsWith(".")) value = "0" + value; // Ensure valid decimal format
+            setAnswers((prev) => ({ ...prev, [currentPage]: value }));
+            }}
+            style={{
+            padding: "8px 10px 8px 25px", // Left padding to avoid overlap with "$"
+            width: "100%",
+            maxWidth: "400px",
+            border: "2px solid gray",
+            borderRadius: "5px",
+            fontSize: "16px",
+            textAlign: "left",
+            }}
+        />
+        </div>
     )}
 
     {questions[currentPage].inputType === "range" && (
