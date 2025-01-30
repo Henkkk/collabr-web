@@ -17,10 +17,6 @@ export default function AboutPage() {
         </p>
 
         <p className="mb-4 sm:mb-6 text-sm sm:text-base">
-          How do we make money? We take 2.5% commission fees from each sales.
-        </p>
-
-        <p className="mb-4 sm:mb-6 text-sm sm:text-base">
           We're excited to see how you use Collabr to grow your community and continue to create amazing works.
         </p>
 

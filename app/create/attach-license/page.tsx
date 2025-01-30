@@ -232,8 +232,9 @@ export default function AttachLicensePage() {
                         } : {}),
                         
                         ...((template.id === '2') ? {
-                            derivativesAllowed: false,
-                            derivativesAttribution: false,
+                            derivativesAllowed: formData.derivativesAllowed === 'true',
+                            derivativesAttribution: formData.derivativesAttribution === 'true',
+                            derivativesApproval: formData.derivativesApproval === 'true',
                             commercialUse: true,
                             commercialAttribution: true,
                         } : {}),
@@ -435,16 +436,31 @@ export default function AttachLicensePage() {
                                     })}
                                 />
                             ) : ['royaltyPolicy', 'commercializerChecker', 'commercializerCheckerData'].includes(param) ? (
-                                <input
-                                    type="text"
-                                    placeholder=""
-                                    className="w-full p-2 border rounded"
-                                    value={formData[param] || ''}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        [param]: e.target.value
-                                    })}
-                                />
+                                <>
+                                    <input
+                                        type="text"
+                                        placeholder=""
+                                        className="w-full p-2 border rounded"
+                                        value={formData[param] || ''}
+                                        onChange={(e) => setFormData({
+                                            ...formData,
+                                            [param]: e.target.value
+                                        })}
+                                    />
+                                    {param === 'royaltyPolicy' && (
+                                        <div className="mt-4">
+                                            <label className="block text-sm font-medium mb-1">
+                                                Currency
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
+                                                value="sUSD (0xC0F6E387aC0B324Ec18EAcf22EE7271207dCE3d5)"
+                                                disabled
+                                            />
+                                        </div>
+                                    )}
+                                </>
                             ) : param === 'commercialRevShare' ? (
                                 <input
                                     type="number"

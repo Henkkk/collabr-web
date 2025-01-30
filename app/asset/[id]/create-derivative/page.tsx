@@ -35,6 +35,7 @@ const initDB = async () => {
 
 interface Asset {
   id: string;
+  ipid: string;
   title: string;
   description: string;
   imageURL: string;
@@ -90,6 +91,7 @@ export default function CreateDerivativePage({ params }: PageProps) {
           const data = assetDoc.data();
           setOriginalAsset({
             id: assetDoc.id,
+            ipid:String(data.ipId || ''),
             title: String(data.title || ''),
             description: String(data.description || ''),
             imageURL: String(data.imageURL || ''),
@@ -287,7 +289,15 @@ export default function CreateDerivativePage({ params }: PageProps) {
           </div>
           <div className="min-w-0">
             <h3 className="text-lg font-bold truncate">{originalAsset.title}</h3>
-            <p className="text-sm text-gray-600">by "Creator Name"</p>
+            <p className="text-sm text-gray-600 mb-2">
+              IPID: 
+              <a href={`https://opensea.io/assets/ethereum/${originalAsset.ipid}`} 
+                      className="hover:text-blue-600 hover:underline" 
+                      target="_blank" 
+                      rel="noopener noreferrer">
+                {originalAsset.ipid}
+              </a>
+            </p>
             <p className="text-sm text-gray-700 line-clamp-2">{originalAsset.description}</p>
           </div>
         </div>
@@ -421,14 +431,18 @@ export default function CreateDerivativePage({ params }: PageProps) {
               <CardTitle>Preview</CardTitle>
             </CardHeader>
             <CardContent>
-              {image && (
+              {image ? (
                 <div className="aspect-square w-full relative mb-4">
                   <img src={image} alt="Preview" className="object-cover rounded-lg" />
                 </div>
+              ) : (
+                <div className="aspect-square w-full relative mb-4 bg-secondary flex items-center justify-center rounded-lg">
+                  <p className="text-gray-500">Preview</p>
+                </div>
               )}
               <h2 className="text-xl font-bold mb-2">{name || 'Untitled'}</h2>
-              <p className="text-sm text-gray-500 mb-2">{derivativeType || 'Type of derivative work'}</p>
-              <p className="text-sm text-gray-500 mb-4">{description || '###'}</p>
+              <p className="text-sm text-gray-500 mb-2">{derivativeType || ''}</p>
+              <p className="text-sm text-gray-500 mb-4">{description || ''}</p>
               
               {proposedTerms && (
                 <div className="mb-4">

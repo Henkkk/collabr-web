@@ -91,7 +91,7 @@ export default async function AssetPage(props: Props) {
             <div className="absolute top-0 right-0">
               <a
                 href={`/asset/${asset.id}/create-derivative`}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg inline-flex items-center"
+                className="bg-[#008CFF] hover:bg-[#0070CC] text-white font-semibold py-2 px-4 rounded-lg inline-flex items-center"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
@@ -157,7 +157,7 @@ export default async function AssetPage(props: Props) {
               <div>
                 <h2 className="text-xl font-semibold mb-2">Royalty</h2>
                 <p className="text-2xl font-bold">${asset.price}</p>
-                <WaitlistButton assetId={asset.id} />
+                {/* <WaitlistButton assetId={asset.id} /> */}
               </div>
 
               <div>
@@ -215,6 +215,10 @@ export default async function AssetPage(props: Props) {
                               {asset.license.terms.derivativesReciprocal ? '✓' : '✕'}
                             </span>
                             <span>Reciprocal License Required</span>
+                          </div>
+                          <div className="flex items-center">
+                            <span className="mr-2 text-blue-600">$</span>
+                            <span>Minting Fee: ${asset.price}</span>
                           </div>
                         </>
                       )}
