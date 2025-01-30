@@ -6,6 +6,7 @@ import WaitlistButton from '@/components/ui/waitlistButton'
 interface Asset {
   id: string;
   title: string;
+  ipid: string;
   description: string;
   imageURL: string;
   creator: string;
@@ -46,11 +47,12 @@ export default async function AssetPage(props: Props) {
     if (assetDoc.exists()) {
       const data = assetDoc.data()
 
-      console.log("data", data);
+      //console.log("data", data);
 
       asset = {
         id: assetDoc.id,
         title: String(data.title || ''),
+        ipid: String(data.ipId || ''),
         description: String(data.description || 'N/A'),
         imageURL: String(data.imageURL || ''),
         creator: String(data.creator_name || ''),
@@ -120,7 +122,31 @@ export default async function AssetPage(props: Props) {
             <div className="space-y-6">
               <div>
                 <h1 className="text-3xl font-bold mb-2">{asset.title}</h1>
-                {/* <p className="text-gray-600">Asset owner: {asset.creator}</p> */}
+                <p className="text-gray-600">
+                  IPID:{' '}
+                  <a 
+                    href={`https://explorer.story.foundation/ipa/${asset.ipid}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-blue-600 inline-flex items-center"
+                  >
+                    {asset.ipid}
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      className="h-4 w-4 ml-1" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" 
+                      />
+                    </svg>
+                  </a>
+                </p>
               </div>
 
               <div>

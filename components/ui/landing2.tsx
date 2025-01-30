@@ -64,9 +64,14 @@ export default function Landing2() {
                             width={24}
                             height={24}
                         />
-                        <p className="text-gray-600 dark:text-gray-400 text-lg">
+                        <a 
+                            href="https://www.story.foundation/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-600 dark:text-gray-400 text-lg"
+                        >
                             Powered by Story Protocol
-                        </p>
+                        </a>
                     </div>
                 </motion.div>
             </section>

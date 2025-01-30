@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWalletClient } from 'wagmi';
 import { zeroAddress } from 'viem'
@@ -22,9 +22,6 @@ interface AssetAttribute {
 const convertDateToTimestamp = (dateString: string) => {
     return dateString ? new Date(dateString).getTime() : 0;
 };
-const SUPPORTED_CURRENCIES = ['sUSD'] as const;
-
-export type SupportedCurrency = typeof SUPPORTED_CURRENCIES[number];
 
 const initDB = async () => {
   return new Promise<IDBDatabase>((resolve, reject) => {
@@ -111,9 +108,29 @@ export default function AttachLicensePage() {
             const nftHash = createHash('sha256').update(JSON.stringify(nftMetadata)).digest('hex');
 
             // 4. Register the NFT as an IP Asset with Story Protocol
+            console.log('pilTerms', pilTerms)
+            
             const spResponse = await client.ipAsset.mintAndRegisterIpAssetWithPilTerms({
                 spgNftContract: process.env.NEXT_PUBLIC_SPG_NFT_CONTRACT_ADDRESS as `0x${string}`,
-                terms: pilTerms,
+                terms: [{
+                    transferable: formData.transferable === 'true',
+                    royaltyPolicy: "0x7D2d9af4E4ab14Afcfd86436BC348928B40963Dd",
+                    defaultMintingFee: Number(formData.defaultMintingFee) || 0,
+                    expiration: BigInt(convertDateToTimestamp(formData.expiration)),
+                    commercialUse: pilTerms.commercialUse,
+                    commercialAttribution: pilTerms.commercialAttribution,
+                    commercializerChecker: zeroAddress,
+                    commercializerCheckerData: zeroAddress,
+                    commercialRevShare: Number(formData.commercialRevShare) || 0,
+                    commercialRevCeiling: Number(formData.commercialRevCeiling) || 0,
+                    derivativesAllowed: pilTerms.derivativesAllowed,
+                    derivativesAttribution: pilTerms.derivativesAttribution,
+                    derivativesApproval: pilTerms.derivativesApproval,
+                    derivativesReciprocal: formData.derivativesReciprocal === 'true',
+                    derivativeRevCeiling: Number(formData.derivativeRevCeiling) || 0,
+                    currency: "0xC0F6E387aC0B324Ec18EAcf22EE7271207dCE3d5",
+                    uri: formData.uri || '',
+                }],
                 ipMetadata: {
                     ipMetadataURI: `https://ipfs.io/ipfs/${ipIpfsHash}`,
                     ipMetadataHash: `0x${ipHash}`,
@@ -189,6 +206,16 @@ export default function AttachLicensePage() {
         template: typeof licenseTemplates[0], 
         onBack: () => void 
     }) => {
+        // Add useEffect to set default royalty policy when commercial use is enabled
+        useEffect(() => {
+            if ((template.id === '2' || template.id === '3') && !formData.royaltyPolicy) {
+                setFormData(prev => ({
+                    ...prev,
+                    royaltyPolicy: "0x7D2d9af4E4ab14Afcfd86436BC348928B40963Dd"
+                }));
+            }
+        }, [template.id]); // Only run when template.id changes
+
         return (
             <div>
                 <h2 className="text-xl font-semibold mb-4">{template.name}</h2>
@@ -205,6 +232,8 @@ export default function AttachLicensePage() {
                         } : {}),
                         
                         ...((template.id === '2') ? {
+                            derivativesAllowed: false,
+                            derivativesAttribution: false,
                             commercialUse: true,
                             commercialAttribution: true,
                         } : {}),
@@ -218,14 +247,14 @@ export default function AttachLicensePage() {
                         royaltyPolicy: formData.royaltyPolicy || "",
                         defaultMintingFee: parseFloat(formData.defaultMintingFee || '0'),
                         expiration: convertDateToTimestamp(formData.expiration),
-                        commercializerChecker: "",
-                        commercializerCheckerData: "",
+                        commercializerChecker: formData.commercializerChecker || zeroAddress,
+                        commercializerCheckerData: formData.commercializerCheckerData || zeroAddress,
                         commercialRevShare: parseInt(formData.commercialRevShare || '50'),
                         commercialRevCeiling: "",
                         derivativesApproval: false,
                         derivativesReciprocal: formData.derivativesReciprocal === 'true',
                         derivativeRevCeiling: "",
-                        currency: formData.currency || zeroAddress,
+                        currency: "0xC0F6E387aC0B324Ec18EAcf22EE7271207dCE3d5",
                         uri: formData.uri || "",
                     };
                     handleSubmit(e, pilTerms);
@@ -387,7 +416,14 @@ export default function AttachLicensePage() {
                             <label className="block text-sm font-medium mb-1">
                                 {param.split(/(?=[A-Z])/).join(' ')}
                             </label>
-                            {param === 'defaultMintingFee' || param === 'commercialRevCeiling' ? (
+                            {param === 'currency' ? (
+                                <input
+                                    type="text"
+                                    className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
+                                    value="sUSD (0xC0F6E387aC0B324Ec18EAcf22EE7271207dCE3d5)"
+                                    disabled
+                                />
+                            ) : param === 'defaultMintingFee' || param === 'commercialRevCeiling' ? (
                                 <input
                                     type="number"
                                     min="0"
@@ -409,22 +445,6 @@ export default function AttachLicensePage() {
                                         [param]: e.target.value
                                     })}
                                 />
-                            ) : param === 'currency' ? (
-                                <select
-                                    className="w-full p-2 border rounded"
-                                    value={formData[param] || ''}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        [param]: e.target.value
-                                    })}
-                                >
-                                    <option value="">Select currency...</option>
-                                    {SUPPORTED_CURRENCIES.map((currency) => (
-                                        <option key={currency} value={currency}>
-                                            {currency}
-                                        </option>
-                                    ))}
-                                </select>
                             ) : param === 'commercialRevShare' ? (
                                 <input
                                     type="number"
