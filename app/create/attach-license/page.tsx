@@ -184,17 +184,46 @@ const Survey = () => {
         </div>
     )}
 
-    {questions[currentPage].inputType === "date" && (
+{questions[currentPage].inputType === "date" && (
+  <div style={{ textAlign: "center" }}>
+
+<div style={{ marginTop: "10px", display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
       <input
-        type="date"
-        className="w-full p-2 border rounded"
-        style={{
-          margin: "30px auto",
-          width: "100%",
-          maxWidth: "400px", // Limit the width of the input
+        type="checkbox"
+        id="never-checkbox"
+        checked={answers[currentPage] === "Never"} // Check if "Never" is selected
+        onChange={(e) => {
+          if (e.target.checked) {
+            handleInputChange("Never", currentPage); // Set to "Never"
+          } else {
+            handleInputChange("", currentPage); // Clear the date
+          }
         }}
       />
+      <label htmlFor="never-checkbox" style={{ fontSize: "16px", fontWeight: "bold", cursor: "pointer" }}>
+        Never Expires
+      </label>
+    </div>
+
+    {answers[currentPage] === "Never" && (
+      <div style={{ marginTop: "10px", fontSize: "16px", fontWeight: "bold", color: "red" }}>
+        License will never expire.
+      </div>
     )}
+    <input
+      type="date"
+      value={answers[currentPage] === "Never" ? "" : answers[currentPage] || ""}
+      onChange={(e) => handleInputChange(e.target.value, currentPage)}
+      disabled={answers[currentPage] === "Never"} // Disable if "Never" is selected
+      className="w-full p-2 border rounded"
+      style={{
+        margin: "30px auto",
+        width: "100%",
+        maxWidth: "400px",
+      }}
+    />
+  </div>
+)}
   </div>
 
   <div style={{ marginTop: "20px" }}>
