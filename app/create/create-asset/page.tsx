@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PlusCircle, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { useDynamicContext } from "@dynamic-labs/sdk-react-core"
 
 const initDB = async () => {
   return new Promise<IDBDatabase>((resolve, reject) => {
@@ -41,6 +42,7 @@ export default function CreateAssetPage() {
   });
   const [currentTag, setCurrentTag] = useState('')
   const [name, setName] = useState(() => localStorage.getItem('assetName') || '');
+  const { primaryWallet, user: dynamicUser } = useDynamicContext();
 
   const router = useRouter()
 
@@ -163,6 +165,17 @@ export default function CreateAssetPage() {
       console.error('Error clearing image from IndexedDB:', error);
     }
   };
+
+  if (!primaryWallet?.address && !dynamicUser?.email) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Connect to create asset</h1>
+          <p>Please connect your wallet or sign in with email</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto p-4">

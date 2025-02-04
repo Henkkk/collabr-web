@@ -1,5 +1,5 @@
 'use client'
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import azuki_sample from '@/media/azuki_sample.png'
@@ -75,6 +75,7 @@ export default function Landing2() {
                     </div>
                 </motion.div>
             </section>
+
 
             {/* How it Works Section */}
             <section className="container mx-auto px-4 py-20 relative">
@@ -199,7 +200,7 @@ export default function Landing2() {
             {/* CTA Section */}
             <section className="container mx-auto px-4 py-20">
                 <motion.div 
-                    className="text-center space-x-4"
+                    className="text-center flex flex-col sm:flex-row gap-4 justify-center items-center"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -207,23 +208,163 @@ export default function Landing2() {
                     <motion.a 
                         href="/learn"
                         onClick={() => track('tutorial_video_click')}
-                        className="inline-block w-48 px-8 py-4 bg-gradient-to-r from-[#008CFF] to-[#0070CC] hover:from-[#0080E6] hover:to-[#0066B8] text-white font-semibold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        className="group relative inline-flex items-center justify-center px-8 py-4 w-64 bg-gradient-to-r from-[#008CFF] to-[#0070CC] text-white font-semibold rounded-xl shadow-lg transition-all duration-300 hover:shadow-blue-500/25 hover:shadow-2xl"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                     >
-                        Watch our tutorial video
+                        <span className="mr-2">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </span>
+                        Watch Tutorial
                     </motion.a>
                     <motion.a 
                         href="https://cal.com/henry-yeung/15min"
                         onClick={() => track('book_call_click')}
-                        className="inline-block w-48 px-8 py-4 bg-white dark:bg-gray-800 text-[#008CFF] border-2 border-[#008CFF] font-semibold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        className="group relative inline-flex items-center justify-center px-8 py-4 w-64 border-2 border-[#008CFF] text-[#008CFF] dark:text-white font-semibold rounded-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all duration-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:shadow-xl"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                     >
-                        Book a Call With Us
+                        <span className="mr-2">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </span>
+                        Book a Call
                     </motion.a>
                 </motion.div>
             </section>
+
+            {/* New Promotion Section */}
+            <section className="container mx-auto px-4 py-16">
+                <motion.div 
+                    className="group relative overflow-hidden rounded-[2rem] border border-white/20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-3xl shadow-2xl shadow-blue-500/20 dark:shadow-blue-900/20"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                >
+                    <div className="absolute inset-0 pattern-dots pattern-blue-500/10 pattern-size-4 pattern-opacity-100 dark:pattern-blue-900/10" />
+                    
+                    <div className="relative flex flex-col lg:flex-row items-center justify-between gap-8 p-8 lg:p-12">
+                        {/* Left Content */}
+                        <div className="flex-1 space-y-6 text-center lg:text-left">
+                            <div className="inline-flex items-center gap-3 bg-white/10 px-6 py-2 rounded-full border border-white/20">
+                                <span className="text-2xl">🎉</span>
+                                <span className="font-semibold text-[#008CFF]">Limited Offer</span>
+                                <div className="h-4 w-px bg-white/20" />
+                                <CountdownTimer />
+                            </div>
+                            
+                            <h2 className="text-4xl lg:text-5xl font-bold text-[#008CFF]">
+                                First Mint Free<br />
+                                <span className="text-xl lg:text-2xl font-medium text-[#008CFF]/80">For New Creators This Week</span>
+                            </h2>
+                            
+                            <ul className="flex flex-col gap-3 text-[#008CFF] text-lg">
+                                <li className="flex items-center gap-2">
+                                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Login with your email, no wallet required.
+                                </li>
+                                <li className="flex items-center gap-2">
+                                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Create your first IP on Story Protocol
+                                </li>
+                            </ul>
+                        </div>
+
+                        {/* Right Content */}
+                        <div className="relative w-full lg:w-auto flex flex-col items-center gap-6">
+                            <div className="relative w-48 h-48 lg:w-64 lg:h-64">
+                                <div className="absolute inset-0 bg-white/10 rounded-3xl blur-xl" />
+                                <div className="relative z-10 flex items-center justify-center w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl shadow-xl">
+                                    <div className="text-center space-y-2">
+                                        <div className="text-6xl lg:text-7xl">🎁</div>
+                                        <div className="text-sm font-semibold text-white/90">FREE MINT</div>
+                                        {/* <div className="text-xstext-[#008CFF]">Value: $50+</div> */}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <motion.button
+                                onClick={() => {
+                                    router.push('/create/create-asset');
+                                    track('free_mint_click');
+                                }}
+                                className="flex items-center gap-2 px-8 py-4 bg-white hover:bg-gray-100 text-[#008CFF] font-bold rounded-xl transition-all duration-300 hover:gap-3 group"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                Claim Your Free Mint
+                                <svg 
+                                    className="w-5 h-5 transition-all duration-300 group-hover:translate-x-1"
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                </svg>
+                            </motion.button>
+                        </div>
+                    </div>
+
+                    {/* Animated floating elements */}
+                    <motion.div 
+                        className="absolute top-0 left-1/4 w-24 h-24 bg-white/5 rounded-full blur-xl"
+                        animate={{ y: [0, -20, 0] }}
+                        transition={{ duration: 4, repeat: Infinity }}
+                    />
+                    <motion.div 
+                        className="absolute bottom-4 right-8 w-16 h-16 bg-purple-500/10 rounded-full blur-lg"
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 5, repeat: Infinity }}
+                    />
+                </motion.div>
+            </section>
+        </div>
+    );
+}
+
+function CountdownTimer() {
+    const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+    useEffect(() => {
+        const target = new Date('2025-02-09T23:59:59');
+        
+        const timer = setInterval(() => {
+            const now = new Date();
+            const difference = target.getTime() - now.getTime();
+            
+            if (difference > 0) {
+                setTimeLeft({
+                    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                    hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+                    minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+                    seconds: Math.floor((difference % (1000 * 60)) / 1000)
+                });
+            }
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, []);
+
+    const formatTime = (time: number) => time.toString().padStart(2, '0');
+
+    return (
+        <div className="flex items-center gap-1 text-sm text-[#008CFF]">
+            <span>{timeLeft.days}d</span>
+            <span>:</span>
+            <span>{formatTime(timeLeft.hours)}h</span>
+            <span>:</span>
+            <span>{formatTime(timeLeft.minutes)}m</span>
+            <span>:</span>
+            <span>{formatTime(timeLeft.seconds)}s</span>
         </div>
     );
 }

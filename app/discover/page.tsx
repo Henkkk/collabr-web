@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label'
 interface IPA {
   id: string
   title: string
+  ipId: string
   description: string
   imageURL: string
   tags: string[]
@@ -105,10 +106,12 @@ const DiscoverPage: React.FC = () => {
         const ipaRef = collection(db, 'IPA')
         const ipaSnapshot = await getDocs(ipaRef)
         
-        const ipaData = ipaSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as IPA[]
+        const ipaData = ipaSnapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          } as IPA))
+          .filter(doc => doc.ipId) // Filter out documents with empty ipid
         setIpas(ipaData)
 
         // Extract unique tags
@@ -238,8 +241,8 @@ const DiscoverPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredIPAs.map(ipa => (
           <Link href={`/asset/${ipa.id}`} key={ipa.id}>
-            <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="aspect-video relative">
+            <Card className="overflow-hidden hover:shadow-lg transition-shadow relative h-[300px]">
+              <div className="absolute inset-0">
                 <Image
                   src={
                     !imageErrors[ipa.id] && isValidImageUrl(ipa.imageURL)
@@ -254,35 +257,19 @@ const DiscoverPage: React.FC = () => {
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />
               </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-lg mb-2">{ipa.title}</h3>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="relative w-6 h-6 rounded-full overflow-hidden">
-                    <Image
-                      src={
-                        creatorProfiles[ipa.creator]?.user_icon
-                          ? creatorProfiles[ipa.creator].user_icon.replace(':443', '')
-                          : DefaultIPAPictures
-                      }
-                      alt={`${creatorProfiles[ipa.creator]?.creator_name || 'Creator'}'s profile picture`}
-                      fill
-                      className="object-cover"
-                    />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
+                <div className="absolute bottom-0 p-4 text-white w-full">
+                  <h3 className="font-semibold text-lg mb-2">{ipa.title}</h3>
+                  <div className="flex flex-wrap gap-1">
+                    {ipa.tags?.map(tag => (
+                      <span
+                        key={tag}
+                        className="text-xs bg-white/20 px-2 py-1 rounded"
+                      >
+                        {tag}
+                      </span>
+                    ))}
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {creatorProfiles[ipa.creator]?.creator_name || 
-                      `${ipa.creator?.slice(0, 6)}...${ipa.creator?.slice(-4)}`}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {ipa.tags?.map(tag => (
-                    <span
-                      key={tag}
-                      className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded"
-                    >
-                      {tag}
-                    </span>
-                  ))}
                 </div>
               </div>
             </Card>
