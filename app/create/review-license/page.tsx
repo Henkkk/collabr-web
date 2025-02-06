@@ -1,12 +1,11 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWalletClient } from 'wagmi';
 import { zeroAddress } from 'viem'
 import { db, storage } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, arrayUnion, getDocs, query, where } from 'firebase/firestore';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
-import { licenseTemplates } from '@/lib/constants/licenseTemplates';
 import { v4 as uuidv4 } from 'uuid';
 import { Notification } from '@/components/ui/notification';
 import { client } from '@/lib/story-protocol/utils/utils'
@@ -49,6 +48,56 @@ export default function AttachLicensePage() {
     const [formData, setFormData] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showNotification, setShowNotification] = useState(false);
+    const [assetImage, setAssetImage] = useState<string | null>(null);
+    const [assetName, setAssetName] = useState<string | null>(null);
+    const [assetDescription, setAssetDescription] = useState<string | null>(null);
+    const [assetAttributes, setAssetAttributes] = useState<string | null>(null);
+    const [assetTags, setAssetTags] = useState<string | null>(null);
+
+
+    useEffect(() => {
+        const loadImageFromIndexedDB = async () => {
+            try {
+                const db = await initDB();
+                const transaction = db.transaction('assets', 'readonly');
+                const store = transaction.objectStore('assets');
+                const imageRequest = store.get('assetImage');
+
+                imageRequest.onsuccess = () => {
+                    if (imageRequest.result) {
+                        setAssetImage(imageRequest.result);
+                    }
+                };
+
+                imageRequest.onerror = () => {
+                    console.error('Failed to load image from IndexedDB:', imageRequest.error);
+                };
+            } catch (error) {
+                console.error('Error loading image from IndexedDB:', error);
+            }
+        };
+
+        setAssetName(localStorage.getItem('assetName'))
+        setAssetDescription(localStorage.getItem('assetDescription'))
+        setAssetAttributes(localStorage.getItem('assetAttributes'))
+        setAssetTags(localStorage.getItem('assetTags'))
+
+        // Load Image from IndexedDB when the page loads
+        loadImageFromIndexedDB();
+    }, []); // Runs only once when the component mounts
+
+    const clearIndexedDB = async () => {
+        try {
+            const db = await initDB();
+            const transaction = db.transaction('assets', 'readwrite');
+            const store = transaction.objectStore('assets');
+            store.delete('assetImage');
+        } catch (error) {
+            console.error('Error clearing IndexedDB:', error);
+        }
+    };
+    
+
     const handleSubmit = async (e: React.FormEvent, pilTerms: any) => {
         e.preventDefault();
         if (!wallet?.account?.address) {
@@ -57,24 +106,7 @@ export default function AttachLicensePage() {
         }
         setIsSubmitting(true);
         try {
-            // Get asset data from localStorage and IndexedDB
-            const assetName = localStorage.getItem('assetName');
-            const assetDescription = localStorage.getItem('assetDescription');
-            const assetAttributes = JSON.parse(localStorage.getItem('assetAttributes') || '[]');
-            const assetTags = JSON.parse(localStorage.getItem('assetTags') || '[]');
-
-            // Get image from IndexedDB
-            const IndexedDB = await initDB();
-            const transaction = IndexedDB.transaction('assets', 'readonly');
-            const store = transaction.objectStore('assets');
-            const imageRequest = store.get('assetImage');
-            
-            const assetImage = await new Promise<string>((resolve, reject) => {
-                imageRequest.onsuccess = () => resolve(imageRequest.result);
-                imageRequest.onerror = () => reject(imageRequest.error);
-            });
-
-            if (!assetName || !assetImage) {
+            if (!assetImage) {
                 throw new Error('Missing required asset data');
             }
 
@@ -166,9 +198,7 @@ export default function AttachLicensePage() {
             }
 
             // Clear IndexedDB after successful submission
-            const clearTransaction = IndexedDB.transaction('assets', 'readwrite');
-            const clearStore = clearTransaction.objectStore('assets');
-            clearStore.delete('assetImage');
+            clearIndexedDB();
 
             // Clear localStorage
             localStorage.removeItem('assetName');
@@ -185,316 +215,6 @@ export default function AttachLicensePage() {
             setIsSubmitting(false);
         }
     };
-    const LicenseConfiguration = ({ template, onBack }: { 
-        template: typeof licenseTemplates[0], 
-        onBack: () => void 
-    }) => {
-        return (
-            <div>
-                <h2 className="text-xl font-semibold mb-4">{template.name}</h2>
-                <form className="space-y-4" onSubmit={(e) => {
-                    const pilTerms = {
-                        ...((template.id === '1') ? {
-                            derivativesAllowed: true,
-                            derivativesAttribution: true,
-                            derivativesApproval: false,
-                            derivativesReciprocal: true,
-                            commercialUse: false,
-                            commercialAttribution: false,
-                            derivativeRevCeiling: BigInt(0),
-                        } : {}),
-                        
-                        ...((template.id === '2') ? {
-                            commercialUse: true,
-                            commercialAttribution: true,
-                        } : {}),
-                        ...((template.id === '3') ? {
-                            derivativesAllowed: true,
-                            derivativesAttribution: true,
-                            commercialUse: true,
-                            commercialAttribution: true,
-                        } : {}),
-                        transferable: formData.transferable === 'true',
-                        royaltyPolicy: formData.royaltyPolicy || "",
-                        defaultMintingFee: parseFloat(formData.defaultMintingFee || '0'),
-                        expiration: convertDateToTimestamp(formData.expiration),
-                        commercializerChecker: "",
-                        commercializerCheckerData: "",
-                        commercialRevShare: parseInt(formData.commercialRevShare || '50'),
-                        commercialRevCeiling: "",
-                        derivativesApproval: false,
-                        derivativesReciprocal: formData.derivativesReciprocal === 'true',
-                        derivativeRevCeiling: "",
-                        currency: formData.currency || zeroAddress,
-                        uri: formData.uri || "",
-                    };
-                    handleSubmit(e, pilTerms);
-                }}>
-                    {template.id === '1' && (
-                        <>
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Derivatives Allowed
-                                    <span className="ml-1 text-xs text-gray-500">(preset)</span>
-                                </label>
-                                <select 
-                                    className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
-                                    value="true"
-                                    disabled
-                                >
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
-                                </select>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Derivatives Attribution
-                                    <span className="ml-1 text-xs text-gray-500">(preset)</span>
-                                </label>
-                                <select 
-                                    className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
-                                    value="true"
-                                    disabled
-                                >
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
-                                </select>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Commercial Use
-                                    <span className="ml-1 text-xs text-gray-500">(preset)</span>
-                                </label>
-                                <select 
-                                    className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
-                                    value="false"
-                                    disabled
-                                >
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
-                                </select>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Commercial Attribution
-                                    <span className="ml-1 text-xs text-gray-500">(preset)</span>
-                                </label>
-                                <select 
-                                    className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
-                                    value="true"
-                                    disabled
-                                >
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
-                                </select>
-                            </div>
-                        </>
-                    )}
-                    {template.id === '2' && (
-                        <>
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Commercial Use
-                                    <span className="ml-1 text-xs text-gray-500">(preset)</span>
-                                </label>
-                                <select 
-                                    className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
-                                    value="true"
-                                    disabled
-                                >
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
-                                </select>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Commercial Attribution
-                                    <span className="ml-1 text-xs text-gray-500">(preset)</span>
-                                </label>
-                                <select 
-                                    className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
-                                    value="true"
-                                    disabled
-                                >
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
-                                </select>
-                            </div>
-                        </>
-                    )}
-                    {template.id === '3' && (
-                        <>
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Derivatives Allowed
-                                    <span className="ml-1 text-xs text-gray-500">(preset)</span>
-                                </label>
-                                <select 
-                                    className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
-                                    value="true"
-                                    disabled
-                                >
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
-                                </select>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Derivatives Attribution
-                                    <span className="ml-1 text-xs text-gray-500">(preset)</span>
-                                </label>
-                                <select 
-                                    className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
-                                    value="true"
-                                    disabled
-                                >
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
-                                </select>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Commercial Use
-                                    <span className="ml-1 text-xs text-gray-500">(preset)</span>
-                                </label>
-                                <select 
-                                    className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
-                                    value="true"
-                                    disabled
-                                >
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
-                                </select>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Commercial Attribution
-                                    <span className="ml-1 text-xs text-gray-500">(preset)</span>
-                                </label>
-                                <select 
-                                    className="w-full p-2 border rounded bg-gray-100 cursor-not-allowed"
-                                    value="true"
-                                    disabled
-                                >
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
-                                </select>
-                            </div>
-                        </>
-                    )}
-                    {template.parameters.map((param) => (
-                        <div key={param}>
-                            <label className="block text-sm font-medium mb-1">
-                                {param.split(/(?=[A-Z])/).join(' ')}
-                            </label>
-                            {param === 'defaultMintingFee' || param === 'commercialRevCeiling' ? (
-                                <input
-                                    type="number"
-                                    min="0"
-                                    className="w-full p-2 border rounded"
-                                    value={formData[param] || ''}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        [param]: e.target.value
-                                    })}
-                                />
-                            ) : ['royaltyPolicy', 'commercializerChecker', 'commercializerCheckerData'].includes(param) ? (
-                                <input
-                                    type="text"
-                                    placeholder=""
-                                    className="w-full p-2 border rounded"
-                                    value={formData[param] || ''}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        [param]: e.target.value
-                                    })}
-                                />
-                            ) : param === 'currency' ? (
-                                <select
-                                    className="w-full p-2 border rounded"
-                                    value={formData[param] || ''}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        [param]: e.target.value
-                                    })}
-                                >
-                                    <option value="">Select currency...</option>
-                                    {SUPPORTED_CURRENCIES.map((currency) => (
-                                        <option key={currency} value={currency}>
-                                            {currency}
-                                        </option>
-                                    ))}
-                                </select>
-                            ) : param === 'commercialRevShare' ? (
-                                <input
-                                    type="number"
-                                    min="0"
-                                    max="100"
-                                    className="w-full p-2 border rounded"
-                                    value={formData[param] || '0'}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        [param]: e.target.value
-                                    })}
-                                />
-                            ) : param === 'uri' ? (
-                                <input
-                                    type="text"
-                                    className="w-full p-2 border rounded"
-                                    value={formData[param] || ''}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        [param]: e.target.value
-                                    })}
-                                />
-                            ) : param === 'expiration' ? (
-                                <input
-                                    type="date"
-                                    className="w-full p-2 border rounded"
-                                    value={formData[param] || ''}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        [param]: e.target.value
-                                    })}
-                                />
-                            ) : (
-                                <select
-                                    className="w-full p-2 border rounded"
-                                    value={formData[param] || ''}
-                                    onChange={(e) => setFormData({
-                                        ...formData,
-                                        [param]: e.target.value
-                                    })}
-                                >
-                                    <option value="">Select...</option>
-                                    <option value="true">Yes</option>
-                                    <option value="false">No</option>
-                                </select>
-                            )}
-                        </div>
-                    ))}
-                    
-                    <div className="flex justify-between gap-4">
-                        <button
-                            type="button"
-                            onClick={onBack}
-                            className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
-                            disabled={isSubmitting}
-                        >
-                            Select another license
-                        </button>
-                        <button
-                            type="submit"
-                            className="bg-black text-white px-4 py-2 rounded"
-                            disabled={isSubmitting}
-                        >
-                            {isSubmitting ? 'Creating...' : 'Create PIL License'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        );
-    };
     return (
         <div className="p-6 max-w-4xl mx-auto">
             <Notification
@@ -505,8 +225,9 @@ export default function AttachLicensePage() {
                 type="success"
                 showConfirm={true}
             />
+            
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Attach License</h1>
+                <h1 className="text-2xl font-bold">Review & Attach License</h1>
                 <button
                     onClick={() => {
                         // Don't clear any data when going back to create-asset
@@ -517,46 +238,71 @@ export default function AttachLicensePage() {
                     Back
                 </button>
             </div>
-            
-            {!selectedTemplate ? (
-                <>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {licenseTemplates.map((template) => (
-                            <div 
-                                key={template.id}
-                                className="border p-4 rounded-lg cursor-pointer hover:border-blue-500"
-                                onClick={() => setSelectedTemplate(template.id)}
-                            >
-                                <h2 className="font-semibold">{template.name}</h2>
-                                <p className="text-sm text-gray-600 mt-2">{template.description}</p>
-                                
-                                <div className="mt-4">
-                                    <h3 className="text-sm font-medium text-gray-700 mb-2">
-                                        This license allows:
-                                    </h3>
-                                    <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
-                                        {template.details.map((detail, index) => (
-                                            <li key={index}>{detail}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <button
-                        onClick={() => router.push('/create/custom-license')}
-                        className="w-full mt-6 p-4 border-2 border-dashed border-blue-500 rounded-lg text-blue-500 hover:bg-blue-50 flex items-center justify-center"
-                    >
-                        <span className="text-xl mr-2">+</span>
-                        Create Custom License from Scratch
-                    </button>
-                </>
-            ) : (
-                <LicenseConfiguration 
-                    template={licenseTemplates.find(t => t.id === selectedTemplate)!}
-                    onBack={() => setSelectedTemplate(null)}
-                />
-            )}
+    
+            {/* Display Asset Information */}
+            <div className="bg-white p-4 rounded shadow mb-6">
+                <h2 className="text-xl font-semibold mb-4">Asset Information</h2>
+                <p><strong>Name:</strong> {assetName || 'N/A'}</p>
+                <p><strong>Description:</strong> {assetDescription || 'N/A'}</p>
+    
+                {/* Display image if available */}
+                <div className="mt-4">
+                    <strong>Image:</strong>
+                    {assetImage ? (
+                        <img
+                            src={assetImage as string}
+                            alt="Asset Preview"
+                            className="mt-2 h-32 w-auto max-w-xs rounded"
+                        />
+                    ) : (
+                        <p>No image available.</p>
+                    )}
+                </div>
+    
+                {/* Display Attributes */}
+                <div className="mt-4">
+                    <strong>Attributes:</strong>
+                    {JSON.parse(assetAttributes || '[]').length > 0 ? (
+                        <ul className="list-disc list-inside mt-2">
+                            {JSON.parse(assetAttributes || '[]').map(
+                                (attr: { key: string; value: string }, index: number) => (
+                                    <li key={index}>{attr.key}: {attr.value}</li>
+                                )
+                            )}
+                        </ul>
+                    ) : (
+                        <p>No attributes specified.</p>
+                    )}
+                </div>
+    
+                {/* Display Tags */}
+                <div className="mt-4">
+                    <strong>Tags:</strong>
+                    {JSON.parse(assetTags || '[]').length > 0 ? (
+                        <p>{JSON.parse(assetTags || '[]').join(', ')}</p>
+                    ) : (
+                        <p>No tags specified.</p>
+                    )}
+                </div>
+            </div>
+    
+            {/* Display License Details */}
+            <div className="bg-white p-4 rounded shadow mb-6">
+                <h2 className="text-xl font-semibold mb-4">License Details</h2>
+                <p><strong>Requires Attribution:</strong> {formData.shouldAttribute || 'N/A'}</p>
+                <p><strong>Remix Fee:</strong> {formData.remixFee ? `$${formData.remixFee}` : 'N/A'}</p>
+                <p><strong>Revenue Share:</strong> {formData.revenueShare ? `${formData.revenueShare}%` : 'N/A'}</p>
+                <p><strong>Expiration Date:</strong> {formData.expiration || 'No expiration'}</p>
+            </div>
+    
+            {/* Submit Button */}
+            <button
+                onClick={(e) => handleSubmit(e, formData)}
+                disabled={isSubmitting}
+                className={`w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+                {isSubmitting ? 'Submitting...' : 'Submit Asset with License'}
+            </button>
         </div>
     );
 }

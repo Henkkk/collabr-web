@@ -1,7 +1,9 @@
 "use client"
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation'
 
 const Survey = () => {
+  const router = useRouter()
   const [currentPage, setCurrentPage] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   
@@ -32,7 +34,7 @@ const Survey = () => {
 
   const isNextDisabled =
   !answers[currentPage] || // No value provided for the current question
-  (questions[currentPage].inputType === "number" && answers[currentPage] === "") || // Empty number input
+  (questions[currentPage].inputType === "dollars" && answers[currentPage] === "") || // Empty number input
   (questions[currentPage].inputType === "range" && answers[currentPage] === null); // No slider value set
 
   const handleNext = () => {
@@ -262,7 +264,8 @@ const Survey = () => {
     ) : (
       <button
         onClick={() => {
-          window.location.href = "/review-license"; // Redirect to the "Thank You" page
+          console.log(answers)
+          router.push('/create/review-license') // Redirect to the "License" Page
         }}
         style={{
           backgroundColor: "#28a745",
