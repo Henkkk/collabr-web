@@ -25,6 +25,16 @@ const initDB = async () => {
   });
 };
 
+const handleUseExistingNFT = async () => {
+  try {
+    // Here you would typically connect to the user's wallet and fetch their NFTs
+    // This is just a placeholder implementation
+    alert('NFT selection feature not implemented yet - please upload a file instead');
+  } catch (error) {
+    console.error('Error accessing NFTs:', error);
+  }
+  };
+
 export default function CreateAssetPage() {
   const [image, setImage] = useState<string | null>(null);
   const [description, setDescription] = useState(() => localStorage.getItem('assetDescription') || '');
@@ -180,114 +190,139 @@ export default function CreateAssetPage() {
   return (
     <div className="container mx-auto p-4">
       <div className="grid md:grid-cols-2 gap-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Asset Name *</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter asset name..."
-              required
-            />
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold">Use Existing NFT</h3>
+            <Button 
+              type="button" 
+              className="w-full" 
+              variant="outline"
+              onClick={handleUseExistingNFT}
+            >
+              Select from Your NFTs
+            </Button>
           </div>
-
-          <div>
-            <Label htmlFor="image">Upload File *</Label>
-            <div className="space-y-2">
-              {image ? (
-                <div className="flex gap-2">
-                  <Button type="button" variant="outline" onClick={() => setImage(null)}>
-                    Remove
-                  </Button>
-                  <div className="relative">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="absolute inset-0 opacity-0 cursor-pointer"
-                    />
-                    <Button type="button" variant="outline">
-                      Change Image
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <Input 
-                  id="image" 
-                  type="file" 
-                  accept="image/*" 
-                  onChange={handleImageChange}
-                  required 
-                />
-              )}
+          
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                or create new
+              </span>
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="description">Description (Optional)</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe your asset..."
-            />
-          </div>
-
-          <div>
-            <Label>Attributes (Optional)</Label>
-            {attributes.map((attr, index) => (
-              <div key={index} className="flex gap-2 mt-2">
-                <Input
-                  placeholder="Key"
-                  value={attr.key}
-                  onChange={(e) => handleAttributeChange(index, 'key', e.target.value)}
-                />
-                <Input
-                  placeholder="Value"
-                  value={attr.value}
-                  onChange={(e) => handleAttributeChange(index, 'value', e.target.value)}
-                />
-                <Button type="button" variant="outline" onClick={() => removeAttribute(index)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-            <Button type="button" onClick={addAttribute} className="mt-2">
-              <PlusCircle className="h-4 w-4 mr-2" /> Add Attribute
-            </Button>
-          </div>
-
-          <div>
-            <Label htmlFor="tags">Tags (Optional)</Label>
-            <div className="flex gap-2">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="name">Asset Name *</Label>
               <Input
-                id="tags"
-                value={currentTag}
-                onChange={(e) => setCurrentTag(e.target.value)}
-                placeholder="Add a tag..."
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter asset name..."
+                required
               />
-              <Button type="button" onClick={addTag}>Add</Button>
             </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {tags.map((tag) => (
-                <span key={tag} className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-sm flex items-center">
-                  {tag}
-                  <button onClick={() => removeTag(tag)} className="ml-1 text-primary-foreground">
-                    <X className="h-3 w-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
-          </div>
 
-          <div className="flex gap-2">
-            <Button type="submit">Next</Button>
-            <Button type="button" variant="outline" onClick={clearForm}>
-              Clear
-            </Button>
-          </div>
-        </form>
+            <div>
+              <Label htmlFor="image">Upload File *</Label>
+              <div className="space-y-2">
+                {image ? (
+                  <div className="flex gap-2">
+                    <Button type="button" variant="outline" onClick={() => setImage(null)}>
+                      Remove
+                    </Button>
+                    <div className="relative">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                      />
+                      <Button type="button" variant="outline">
+                        Change Image
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <Input 
+                    id="image" 
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleImageChange}
+                    required 
+                  />
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="description">Description (Optional)</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Describe your asset..."
+              />
+            </div>
+
+            <div>
+              <Label>Attributes (Optional)</Label>
+              {attributes.map((attr, index) => (
+                <div key={index} className="flex gap-2 mt-2">
+                  <Input
+                    placeholder="Key"
+                    value={attr.key}
+                    onChange={(e) => handleAttributeChange(index, 'key', e.target.value)}
+                  />
+                  <Input
+                    placeholder="Value"
+                    value={attr.value}
+                    onChange={(e) => handleAttributeChange(index, 'value', e.target.value)}
+                  />
+                  <Button type="button" variant="outline" onClick={() => removeAttribute(index)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+              <Button type="button" onClick={addAttribute} className="mt-2">
+                <PlusCircle className="h-4 w-4 mr-2" /> Add Attribute
+              </Button>
+            </div>
+
+            <div>
+              <Label htmlFor="tags">Tags (Optional)</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="tags"
+                  value={currentTag}
+                  onChange={(e) => setCurrentTag(e.target.value)}
+                  placeholder="Add a tag..."
+                />
+                <Button type="button" onClick={addTag}>Add</Button>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {tags.map((tag) => (
+                  <span key={tag} className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-sm flex items-center">
+                    {tag}
+                    <button onClick={() => removeTag(tag)} className="ml-1 text-primary-foreground">
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button type="submit">Next</Button>
+              <Button type="button" variant="outline" onClick={clearForm}>
+                Clear
+              </Button>
+            </div>
+          </form>
+        </div>
 
         <div className="space-y-4">
           <Card>

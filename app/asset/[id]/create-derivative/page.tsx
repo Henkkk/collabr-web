@@ -58,6 +58,12 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+const derivativeTypes = [
+  'Art',
+  'Merchandise',
+  'Other'
+];
+
 export default function CreateDerivativePage({ params }: PageProps) {
   const { id } = use(params);
   const { data: wallet } = useWalletClient();
@@ -196,41 +202,9 @@ export default function CreateDerivativePage({ params }: PageProps) {
       alert('Failed to create derivative, because there is no wallet connected');
       return;
     }
-    try {
-      // Upload image to Firebase Storage
-      const imageId = uuidv4();
-      const imageRef = ref(storage, `ip_assets/${imageId}`);
-      await uploadString(imageRef, image, 'data_url');
-      const imageUrl = await getDownloadURL(imageRef);
 
-      // Create request data
-      const requestData = {
-        status: 'pending',
-        createdAt: new Date().toISOString(),
-        parent: id,
-        creator: wallet.account.address,
-        title: name,
-        description: description,
-        imageURL: imageUrl,
-        attributes: attributes.filter(attr => attr.key && attr.value),
-        tags: tags,
-        remix: 0,
-        royalty: 0,
-      };
-
-      // Create request document in Requests collection
-      const requestRef = await addDoc(collection(db, 'Requests'), requestData);
-      console.log("Derivative request created with ID:", requestRef.id);
-
-      // Clear form data
-      await clearForm();
-      
-      // Show notification instead of redirecting immediately
-      setShowNotification(true);
-    } catch (error) {
-      console.error('Error creating derivative:', error);
-      alert('Failed to create derivative. Please try again.');
-    }
+    // Redirect to review page
+    router.push(`/asset/${id}/create-derivative/review?parentId=${id}`);
   }
   const clearForm = async () => {
     setImage(null);
@@ -291,8 +265,8 @@ export default function CreateDerivativePage({ params }: PageProps) {
             <h3 className="text-lg font-bold truncate">{originalAsset.title}</h3>
             <p className="text-sm text-gray-600 mb-2">
               IPID: 
-              <a href={`https://opensea.io/assets/ethereum/${originalAsset.ipid}`} 
-                      className="hover:text-blue-600 hover:underline" 
+              <a href={`https://explorer.story.foundation/ipa/${originalAsset.ipid}`} 
+                      className="hover:underline" 
                       target="_blank" 
                       rel="noopener noreferrer">
                 {originalAsset.ipid}
@@ -304,6 +278,24 @@ export default function CreateDerivativePage({ params }: PageProps) {
       </div>
       <div className="grid md:grid-cols-2 gap-6">
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label>Type of Derivative Work</Label>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2">
+              {derivativeTypes.map((type) => (
+                <div
+                  key={type}
+                  onClick={() => setDerivativeType(current => current === type ? '' : type)}
+                  className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                    derivativeType === type 
+                      ? 'border-[#008CFF] bg-blue-50 hover:border-[#0077cc]' 
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <span className="text-sm font-medium">{type}</span>
+                </div>
+              ))}
+            </div>
+          </div>
           <div>
             <Label htmlFor="name">Title *</Label>
             <Input
@@ -346,15 +338,6 @@ export default function CreateDerivativePage({ params }: PageProps) {
             </div>
           </div>
           <div>
-            <Label htmlFor="derivativeType">Type of Derivative Work (Optional)</Label>
-            <Input
-              id="derivativeType"
-              value={derivativeType}
-              onChange={(e) => setDerivativeType(e.target.value)}
-              placeholder="e.g., Manga Adaptation, Musical Remix, etc."
-            />
-          </div>
-          <div>
             <Label htmlFor="description">Description (Optional)</Label>
             <Textarea
               id="description"
@@ -374,7 +357,7 @@ export default function CreateDerivativePage({ params }: PageProps) {
             />
           </div> */}
           <div>
-            <Label>Attributes (Optional)</Label>
+            <Label>Traits (Optional)</Label>
             {attributes.map((attr, index) => (
               <div key={index} className="flex gap-2 mt-2">
                 <Input
@@ -440,7 +423,7 @@ export default function CreateDerivativePage({ params }: PageProps) {
                   <p className="text-gray-500">Preview</p>
                 </div>
               )}
-              <h2 className="text-xl font-bold mb-2">{name || 'Untitled'}</h2>
+              <h2 className="text-xl font-bold mb-2">{name || ''}</h2>
               <p className="text-sm text-gray-500 mb-2">{derivativeType || ''}</p>
               <p className="text-sm text-gray-500 mb-4">{description || ''}</p>
               
