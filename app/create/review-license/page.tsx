@@ -44,7 +44,6 @@ const initDB = async () => {
 export default function AttachLicensePage() {
     const router = useRouter();
     const { data: wallet } = useWalletClient();
-    const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
     const [formData, setFormData] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showNotification, setShowNotification] = useState(false);
@@ -96,7 +95,6 @@ export default function AttachLicensePage() {
             console.error('Error clearing IndexedDB:', error);
         }
     };
-    
 
     const handleSubmit = async (e: React.FormEvent, pilTerms: any) => {
         e.preventDefault();
@@ -120,11 +118,11 @@ export default function AttachLicensePage() {
             const ipMetadata: IpMetadata = client.ipAsset.generateIpMetadata({
                 title: assetName || '',
                 description: assetDescription || '',
-                attributes: assetAttributes.map((attr: AssetAttribute) => ({
+                attributes: JSON.parse(assetAttributes || '[]').map((attr: AssetAttribute) => ({
                     key: attr.key,
                     value: attr.value,
                 })),
-                tags: assetTags,
+                tags: JSON.parse(assetTags || '[]'),
             });
 
             // 2. Set up NFT Metadata
