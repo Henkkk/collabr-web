@@ -53,6 +53,37 @@ export default function AttachLicensePage() {
     const [assetAttributes, setAssetAttributes] = useState<string | null>(null);
     const [assetTags, setAssetTags] = useState<string | null>(null);
 
+    const [licenseData, setLicenseData] = useState<AssetLicense>({
+        requiresAttribution: false,
+        licenseFee: 0,
+        revenueShare: 0,
+        expiration: new Date()
+    });
+
+    interface AssetLicense {
+        requiresAttribution: boolean;
+        licenseFee: number;
+        revenueShare: number;
+        expiration: Date;
+    }
+
+    const getLicenseFromLocalStorage = (): AssetLicense | null => {
+        const data = localStorage.getItem("assetLicense");
+        if (!data) return null;
+      
+        const parsed = JSON.parse(data);
+      
+        // Ensure expiration is a Date object
+        if (parsed.expiration && typeof parsed.expiration === "string") {
+          parsed.expiration = new Date(parsed.expiration);
+        }
+
+        if (parsed.requiresAttribution && typeof parsed.requiresAttribution === "boolean") {
+            parsed.requiresAttribution = Boolean(parsed.requiresAttribution)
+        }
+      
+        return parsed;
+    };
 
     useEffect(() => {
         const loadImageFromIndexedDB = async () => {
@@ -80,6 +111,11 @@ export default function AttachLicensePage() {
         setAssetDescription(localStorage.getItem('assetDescription'))
         setAssetAttributes(localStorage.getItem('assetAttributes'))
         setAssetTags(localStorage.getItem('assetTags'))
+
+        const savedLicense = getLicenseFromLocalStorage();
+        if (savedLicense && JSON.stringify(savedLicense) !== JSON.stringify(licenseData)) {
+            setLicenseData(savedLicense);
+        }
 
         // Load Image from IndexedDB when the page loads
         loadImageFromIndexedDB();
@@ -287,10 +323,12 @@ export default function AttachLicensePage() {
             {/* Display License Details */}
             <div className="bg-white p-4 rounded shadow mb-6">
                 <h2 className="text-xl font-semibold mb-4">License Details</h2>
-                <p><strong>Requires Attribution:</strong> {formData.shouldAttribute || 'N/A'}</p>
-                <p><strong>Remix Fee:</strong> {formData.remixFee ? `$${formData.remixFee}` : 'N/A'}</p>
-                <p><strong>Revenue Share:</strong> {formData.revenueShare ? `${formData.revenueShare}%` : 'N/A'}</p>
-                <p><strong>Expiration Date:</strong> {formData.expiration || 'No expiration'}</p>
+                <p><strong>Requires Attribution:</strong> {licenseData.requiresAttribution ? "Yes" : "No"}</p>
+                <p><strong>Remix Fee:</strong> {licenseData.licenseFee}</p>
+                <p><strong>Revenue Share:</strong> {`${licenseData.revenueShare}%`}</p>
+                <p><strong>Expiration Date:</strong> {licenseData.expiration instanceof Date && !isNaN(licenseData.expiration.getTime()) 
+    ? licenseData.expiration.toDateString() 
+    : "Never"}</p>
             </div>
     
             {/* Submit Button */}

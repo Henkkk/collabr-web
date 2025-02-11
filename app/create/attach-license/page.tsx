@@ -5,37 +5,64 @@ import { useRouter } from 'next/navigation'
 const Survey = () => {
   const router = useRouter()
   const [currentPage, setCurrentPage] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, string>>({});
-  
+  const [licenseData, setLicenseData] = useState<AssetLicense>({
+    requiresAttribution: undefined,
+    licenseFee: undefined, 
+    revenueShare: 0,
+    expiration: undefined,
+});
 
+  interface AssetLicense {
+    requiresAttribution: boolean | undefined;
+    licenseFee: number | undefined;
+    revenueShare: number | undefined;
+    expiration: Date | "Never" | undefined;
+  }
+  
   const questions = [
     {
       question: "Should remixes be required to attribute the original work?",
       options: ["Yes", "No"],
+      key: "requiresAttribution",
     },
     {
       question: "What should the licensing fee be to remix the work?",
-      inputType: "dollars", // User enters text
+      inputType: "dollars",
+      key: "licenseFee",
     },
     {
-      question:
-        "What percentage of revenue do you expect from sales of remixes?",
-      inputType: "range", // Range input for percentage
+      question: "What percentage of revenue do you expect from sales of remixes?",
+      inputType: "range",
+      key: "revenueShare",
       range: { min: 0, max: 100 },
     },
     {
       question: "When should the license for this work expire?",
-      inputType: "date"
+      inputType: "date",
+      key: "expiration",
     },
   ];
-  const handleInputChange = (value: string, questionIndex: number) => {
-    setAnswers((prev) => ({ ...prev, [questionIndex]: value }));
+
+  const handleInputChange = (value: string | number | boolean | Date, key: keyof AssetLicense) => {
+    setLicenseData((prev) => ({
+      ...prev,
+      [key]: key === "expiration" && value === "Never" ? "Never" :
+            key === "licenseFee" && value === "" ? "" : value, // Allow empty input
+    }));
   };
 
-  const isNextDisabled =
-  !answers[currentPage] || // No value provided for the current question
-  (questions[currentPage].inputType === "dollars" && answers[currentPage] === "") || // Empty number input
-  (questions[currentPage].inputType === "range" && answers[currentPage] === null); // No slider value set
+  const isNextDisabled = (() => {
+    const currentQuestion = questions[currentPage];
+    const key = currentQuestion.key as keyof AssetLicense;
+    const value = licenseData[key];
+  
+    if (key === "requiresAttribution" && value === undefined) return true;
+    if (key === "licenseFee" && (value === null || value === undefined || String(value).length === 0)) return true;
+    if (key === "revenueShare" && value === 0) return true;
+    if (key === "expiration" && value === undefined) return true;
+  
+    return false;
+  })();
 
   const handleNext = () => {
     if (currentPage < questions.length - 1) {
@@ -51,236 +78,162 @@ const Survey = () => {
 
   return (
     <div style={{ maxWidth: "600px", margin: "0 auto", textAlign: "center" }}>
-  <h1
-  style={{
-    fontSize: "2.5rem", // Increase font size
-    fontWeight: "bold", // Ensure the font is bold
-    marginTop: "20px",
-    marginBottom: "20px", // Add some spacing below the heading
-  }}
->
-  Create License
-</h1>
-  <div>
-    <h2>{questions[currentPage].question}</h2>
+      <h1 style={{ fontSize: "2.5rem", fontWeight: "bold", margin: "20px 0" }}>
+        Create License
+      </h1>
 
-    <div style={{ display: "flex", justifyContent: "center", gap: "30px" }}>
-      {questions[currentPage].options?.map((option, index) => (
-        <div key={index} style={{ margin: "30px 0" }}>
-          <label
-            style={{
-              display: "block",
-              width: "100%",
-              maxWidth: "400px", // Limit the width of each option
-              margin: "0 auto", // Center align the options
-              cursor: "pointer",
-              padding: "10px 20px",
-              borderRadius: "8px",
-              textAlign: "center",
-              fontSize: "16px",
-              fontWeight: "bold",
-              border: "2px solid gray",
-              backgroundColor: "white",
-              color: "black", // Set text color to black
-              transition: "0.3s",
-            }}
-            htmlFor={`option-${currentPage}-${index}`}
-          >
+      <div>
+        <h2>{questions[currentPage].question}</h2>
+
+        {questions[currentPage].options && (
+          <div style={{ display: "flex", justifyContent: "center", gap: "30px" }}>
+            {questions[currentPage].options.map((option, index) => (
+              <label 
+                key={index} 
+                style={{ 
+                  cursor: "pointer",
+                  padding: "10px 20px",
+                  border: `2px solid ${licenseData.requiresAttribution === (option === "Yes") ? "#007bff" : "#cccccc"}`, // Highlight border when selected
+                  backgroundColor: licenseData.requiresAttribution === (option === "Yes") ? "#007bff" : "transparent", // Keep background transparent when unselected
+                  color: licenseData.requiresAttribution === (option === "Yes") ? "#ffffff" : "#000000", // Change text color accordingly
+                  borderRadius: "8px",
+                  transition: "0.3s ease-in-out",
+                }}
+              >
+                <input
+                  type="radio"
+                  name={`question-${currentPage}`}
+                  value={option}
+                  checked={licenseData.requiresAttribution === (option === "Yes")}
+                  onChange={() => handleInputChange(option === "Yes", "requiresAttribution")}
+                  style={{ display: "none" }} // Hide default radio button
+                />
+                {option}
+              </label>
+            ))}
+          </div>
+        )}
+
+        {questions[currentPage].inputType === "dollars" && (
+          <input
+          type="text" // Keep it text to allow the "$" prefix
+          placeholder="Enter a licensing fee"
+          value={licenseData.licenseFee !== undefined && licenseData.licenseFee !== "" ? `$${Number(licenseData.licenseFee)}` : ""}
+          onChange={(e) => {
+            let inputValue = e.target.value;
+        
+            // Remove any non-numeric characters except for the decimal point
+            inputValue = inputValue.replace(/[^0-9.]/g, "");
+        
+            // Convert to number but keep empty value when cleared
+            const numericValue = inputValue === "" ? "" : parseFloat(inputValue);
+        
+            handleInputChange(numericValue, "licenseFee");
+          }}
+          style={{ padding: "8px", width: "100%", maxWidth: "400px", border: "2px solid gray", borderRadius: "5px" }}
+        />
+        )}
+
+        {questions[currentPage].inputType === "range" && (
+          <div>
             <input
-              type="radio"
-              id={`option-${currentPage}-${index}`}
-              name={`question-${currentPage}`}
-              value={option}
-              style={{
-                appearance: "none",
-                display: "none", // Hide the default radio button
-              }}
-              onChange={(e) => {
-                handleInputChange(option, currentPage)
-                const inputs = document.getElementsByName(
-                  `question-${currentPage}`
-                ) as NodeListOf<HTMLInputElement>;
-
-                inputs.forEach((input) => {
-                  const label = document.querySelector(
-                    `label[for="${input.id}"]`
-                  ) as HTMLLabelElement;
-                  label.style.backgroundColor = "white"; // Reset to default
-                  label.style.borderColor = "gray"; // Reset to default
-                  label.style.color = "black"; // Reset text color to black
-                });
-
-                // Highlight the selected option
-                const selectedLabel = document.querySelector(
-                  `label[for="${e.target.id}"]`
-                ) as HTMLLabelElement;
-                selectedLabel.style.backgroundColor = "#007bff"; // Selected color
-                selectedLabel.style.color = "white"; // Change text color to white for selected
-                selectedLabel.style.borderColor = "#007bff"; // Selected border
-              }}
+              type="range"
+              min={questions[currentPage].range?.min}
+              max={questions[currentPage].range?.max}
+              value={licenseData.revenueShare}
+              onChange={(e) => handleInputChange(Number(e.target.value), "revenueShare")}
+              style={{ margin: "30px auto", width: "100%", maxWidth: "400px" }}
             />
-            {option}
+            <div style={{ fontSize: "24px", fontWeight: "bold" }}>{licenseData.revenueShare}%</div>
+          </div>
+        )}
+
+      {questions[currentPage].inputType === "date" && (
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+          
+          {/* Checkbox for "Never Expires" */}
+          <label style={{ display: "block", marginBottom: "10px", cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={licenseData.expiration === "Never"}
+              onChange={(e) => handleInputChange(e.target.checked ? "Never" : new Date(), "expiration")}
+              style={{ marginRight: "8px" }}
+            />
+            Never Expires
           </label>
-        </div>
-      ))}
-    </div>
 
-    {questions[currentPage].inputType === "dollars" && (
-        <div style={{ position: "relative", maxWidth: "400px", margin: "0 auto" }}>
-        <span
-            style={{
-            position: "absolute",
-            left: "10px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            fontSize: "16px",
-            fontWeight: "bold",
-            color: "#333",
-            }}
-        >
-            $
-        </span>
-        <input
-            type="text"
-            placeholder="Enter a licensing fee"
-            value={answers[currentPage] ? `${answers[currentPage]}` : ""}
+          {/* Date Picker Input */}
+          <input
+            type="date"
+            value={
+              licenseData.expiration instanceof Date
+                ? licenseData.expiration.toISOString().split("T")[0] // Stores properly
+                : ""
+            }
             onChange={(e) => {
-            let value = e.target.value.replace(/[^0-9.]/g, ""); // Allow only numbers & decimal
-            if (value.startsWith(".")) value = "0" + value; // Ensure valid decimal format
-            setAnswers((prev) => ({ ...prev, [currentPage]: value }));
+              const localDate = new Date(e.target.value + "T00:00:00"); // Fix timezone shift
+              handleInputChange(localDate, "expiration");
             }}
+            disabled={licenseData.expiration === "Never"}
             style={{
-            padding: "8px 10px 8px 25px", // Left padding to avoid overlap with "$"
-            width: "100%",
-            maxWidth: "400px",
-            border: "2px solid gray",
-            borderRadius: "5px",
-            fontSize: "16px",
-            textAlign: "left",
+              padding: "8px",
+              width: "100%",
+              maxWidth: "400px",
+              border: "2px solid gray",
+              borderRadius: "5px",
+              backgroundColor: licenseData.expiration === "Never" ? "#f0f0f0" : "white",
+              cursor: licenseData.expiration === "Never" ? "not-allowed" : "pointer",
             }}
-        />
+            />
         </div>
-    )}
-
-    {questions[currentPage].inputType === "range" && (
-        <div style={{ textAlign: "center" }}>
-        <input
-            type="range"
-            min={questions[currentPage].range?.min}
-            max={questions[currentPage].range?.max}
-            value={answers[currentPage] || "0"} // Use initial value or default to 0
-            onChange={(e) => {
-                handleInputChange(e.target.value, currentPage)
-                const value = e.target.value;
-                setAnswers((prev) => ({ ...prev, [currentPage]: value }));
-            }}
-            style={{
-            margin: "30px auto",
-            width: "100%",
-            maxWidth: "400px", // Limit the width of the input
-            }}
-        />
-        <div style={{ marginTop: "2px", marginBottom: "40px", fontSize: "24px", fontWeight: "bold" }}>
-            {answers[currentPage] || 0}%
-        </div>
-        </div>
-    )}
-
-{questions[currentPage].inputType === "date" && (
-  <div style={{ textAlign: "center" }}>
-
-<div style={{ marginTop: "10px", display: "flex", justifyContent: "center", alignItems: "center", gap: "10px" }}>
-      <input
-        type="checkbox"
-        id="never-checkbox"
-        checked={answers[currentPage] === "Never"} // Check if "Never" is selected
-        onChange={(e) => {
-          if (e.target.checked) {
-            handleInputChange("Never", currentPage); // Set to "Never"
-          } else {
-            handleInputChange("", currentPage); // Clear the date
-          }
-        }}
-      />
-      <label htmlFor="never-checkbox" style={{ fontSize: "16px", fontWeight: "bold", cursor: "pointer" }}>
-        Never Expires
-      </label>
-    </div>
-
-    {answers[currentPage] === "Never" && (
-      <div style={{ marginTop: "10px", fontSize: "16px", fontWeight: "bold", color: "red" }}>
-        License will never expire.
+      )}
       </div>
-    )}
-    <input
-      type="date"
-      value={answers[currentPage] === "Never" ? "" : answers[currentPage] || ""}
-      onChange={(e) => handleInputChange(e.target.value, currentPage)}
-      disabled={answers[currentPage] === "Never"} // Disable if "Never" is selected
-      className="w-full p-2 border rounded"
-      style={{
-        margin: "30px auto",
-        width: "100%",
-        maxWidth: "400px",
-      }}
-    />
-  </div>
-)}
-  </div>
 
-  <div style={{ marginTop: "20px" }}>
-    <button
-      onClick={handleBack}
-      disabled={currentPage === 0}
-      style={{
-        marginRight: "10px",
-        backgroundColor: currentPage === 0 ? "#cccccc" : "#007bff",
-        color: currentPage === 0 ? "#666666" : "white",
-        cursor: currentPage === 0 ? "not-allowed" : "pointer",
-        border: "none",
-        padding: "10px 20px",
-        borderRadius: "5px",
-      }}
-    >
-      Back
-    </button>
-    {currentPage < questions.length - 1 ? (
+      <div style={{ marginTop: "20px" }}>
         <button
-        onClick={handleNext}
-        disabled={
-        isNextDisabled
-        }
-        style={{
-        backgroundColor: isNextDisabled ? "#cccccc" : "#007bff",
-        color: isNextDisabled ? "#666666" : "white",
-        cursor: isNextDisabled ? "not-allowed" : "pointer",
-        border: "none",
-        padding: "10px 20px",
-        borderRadius: "5px",
-        }}
-    >
-        Next
+          onClick={handleBack}
+          disabled={currentPage === 0}
+          style={{
+            marginRight: "10px",
+            backgroundColor: currentPage === 0 ? "#cccccc" : "#007bff",
+            color: "white",
+            border: "none",
+            padding: "10px 20px",
+            borderRadius: "5px",
+            cursor: currentPage === 0 ? "not-allowed" : "pointer",
+          }}
+        >
+          Back
         </button>
-    ) : (
-      <button
-        onClick={() => {
-          console.log(answers)
-          router.push('/create/review-license') // Redirect to the "License" Page
-        }}
-        style={{
-          backgroundColor: "#28a745",
-          color: "white",
-          cursor: "pointer",
-          border: "none",
-          padding: "10px 20px",
-          borderRadius: "5px",
-        }}
-      >
-        Finish
-      </button>
-    )}
-  </div>
-</div>
+
+        {currentPage < questions.length - 1 ? (
+          <button
+            onClick={handleNext}
+            disabled={isNextDisabled}
+            style={{
+              backgroundColor: isNextDisabled ? "#cccccc" : "#007bff",
+              color: "white",
+              border: "none",
+              padding: "10px 20px",
+              borderRadius: "5px",
+              cursor: isNextDisabled ? "not-allowed" : "pointer",
+            }}
+          >
+            Next
+          </button>
+        ) : (
+          <button
+            onClick={() => {
+              localStorage.setItem('assetLicense', JSON.stringify(licenseData));
+              router.push("/create/review-license");
+            }}
+            style={{ backgroundColor: "#28a745", color: "white", padding: "10px 20px", borderRadius: "5px" }}
+          >
+            Finish
+          </button>
+        )}
+      </div>
+    </div>
   );
 };
 
