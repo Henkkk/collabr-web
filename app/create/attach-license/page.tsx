@@ -545,7 +545,20 @@ export default function AttachLicensePage() {
                 showConfirm={true}
             />
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Attach License</h1>
+                <div className="flex items-center gap-2">
+                    <h1 className="text-2xl font-bold">Attach License</h1>
+                    <a 
+                        href="https://github.com/piplabs/pil-document/blob/v1.3.0/Story%20Foundation%20-%20Programmable%20IP%20License%20(1.31.25).pdf"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1 rounded-full transition-colors text-sm font-medium flex items-center gap-1.5"
+                    >
+                        <span>Learn More</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                            <path fillRule="evenodd" d="M5 10a.75.75 0 01.75-.75h6.638L10.23 7.29a.75.75 0 111.04-1.08l3.5 3.25a.75.75 0 010 1.08l-3.5 3.25a.75.75 0 11-1.04-1.08l2.158-1.96H5.75A.75.75 0 015 10z" clipRule="evenodd" />
+                        </svg>
+                    </a>
+                </div>
                 <button
                     onClick={() => {
                         // Don't clear any data when going back to create-asset
