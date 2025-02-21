@@ -10,6 +10,14 @@ export default {
   ],
   theme: {
   	extend: {
+      fontFamily: {
+        'sans': ['Space Grotesk', 'system-ui', 'sans-serif'],
+        'heading': ['Syne', 'sans-serif'],
+        'mono': ['Space Mono', 'monospace'],
+        'display': ['Modius Extended', 'sans-serif'],
+        'body': ['Inter', 'sans-serif'],
+        'accent': ['Detacher', 'sans-serif'],
+      },
       keyframes: {
         blob: {
           "0%": {
