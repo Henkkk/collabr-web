@@ -237,7 +237,7 @@ export default function Landing2() {
                 </motion.div>
             </section>
 
-            {/* New Promotion Section */}
+            {/* 
             <section className="container mx-auto px-4 py-16">
                 <motion.div 
                     className="group relative overflow-hidden rounded-[2rem] border border-white/20 bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-3xl shadow-2xl shadow-blue-500/20 dark:shadow-blue-900/20"
@@ -249,7 +249,6 @@ export default function Landing2() {
                     <div className="absolute inset-0 pattern-dots pattern-blue-500/10 pattern-size-4 pattern-opacity-100 dark:pattern-blue-900/10" />
                     
                     <div className="relative flex flex-col lg:flex-row items-center justify-between gap-8 p-8 lg:p-12">
-                        {/* Left Content */}
                         <div className="flex-1 space-y-6 text-center lg:text-left">
                             <div className="inline-flex items-center gap-3 bg-white/10 px-6 py-2 rounded-full border border-white/20">
                                 <span className="text-2xl">🎉</span>
@@ -279,7 +278,6 @@ export default function Landing2() {
                             </ul>
                         </div>
 
-                        {/* Right Content */}
                         <div className="relative w-full lg:w-auto flex flex-col items-center gap-6">
                             <div className="relative w-48 h-48 lg:w-64 lg:h-64">
                                 <div className="absolute inset-0 bg-white/10 rounded-3xl blur-xl" />
@@ -287,7 +285,6 @@ export default function Landing2() {
                                     <div className="text-center space-y-2">
                                         <div className="text-6xl lg:text-7xl">🎁</div>
                                         <div className="text-sm font-semibold text-white/90">FREE MINT</div>
-                                        {/* <div className="text-xstext-[#008CFF]">Value: $50+</div> */}
                                     </div>
                                 </div>
                             </div>
@@ -314,7 +311,6 @@ export default function Landing2() {
                         </div>
                     </div>
 
-                    {/* Animated floating elements */}
                     <motion.div 
                         className="absolute top-0 left-1/4 w-24 h-24 bg-white/5 rounded-full blur-xl"
                         animate={{ y: [0, -20, 0] }}
@@ -327,6 +323,7 @@ export default function Landing2() {
                     />
                 </motion.div>
             </section>
+            */}
         </div>
     );
 }
